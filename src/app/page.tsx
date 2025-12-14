@@ -9,7 +9,7 @@ import VSCodeApp from '@/components/apps/VSCodeApp';
 import SafariApp from '@/components/apps/SafariApp';
 import NotesApp from '@/components/apps/NotesApp';
 import FinderApp from '@/components/apps/FinderApp';
-import { resume } from 'react-dom/server';
+import SiriApp from '@/components/apps/SiriApp'; // Import the new component
 
 export default function Desktop() {
   const [windows, setWindows] = useState({
@@ -44,6 +44,19 @@ export default function Desktop() {
     }
   };
 
+  const openApp = (id: string) => {
+    const app = windows[id as keyof typeof windows];
+    // If already open, just bring to front and restore if minimized
+    if (app.isOpen) {
+      setWindows(prev => ({ ...prev, [id]: { ...app, isMinimized: false } }));
+      bringToFront(id);
+    } else {
+      // If closed, open it
+      setWindows(prev => ({ ...prev, [id]: { ...app, isOpen: true, isMinimized: false } }));
+      bringToFront(id);
+    }
+  };
+
   const closeApp = (id: string) => {
     setWindows(prev => ({ ...prev, [id]: { ...prev[id as keyof typeof windows], isOpen: false } }));
   };
@@ -51,16 +64,12 @@ export default function Desktop() {
   return (
     <main className="w-screen h-screen overflow-hidden relative">
 
-      {/* 1. MenuBar sits at the top (Z-index high to stay above windows if they maximize) */}
+      {/* 1. MenuBar sits at the top */}
       <div className="absolute top-0 left-0 w-full z-50">
         <MenuBarLayout />
       </div>
 
-      {/* 2. DESKTOP BOUNDARY CONTAINER 
-        This div creates the "bounds" for the windows. 
-        It starts 30px (approx menu height) from the top.
-        The windows cannot be dragged higher than the top of this div.
-      */}
+      {/* 2. DESKTOP BOUNDARY CONTAINER */}
       <div className="absolute top-[36px] left-0 w-full h-[calc(100vh-30px)]">
 
         {/* VS CODE */}
@@ -111,17 +120,6 @@ export default function Desktop() {
           <SafariApp />
         </WindowLayout>
 
-        {/* CALCULATOR */}
-        <WindowLayout
-          id="calculator"
-          title="Calculator"
-          isOpen={windows.calculator.isOpen} isMinimized={windows.calculator.isMinimized}
-          onClose={() => closeApp('calculator')} onMinimize={() => toggleApp('calculator')} onFocus={() => bringToFront('calculator')}
-          zIndex={windows.calculator.z} width={280} height={380}
-        >
-          <CalculatorApp />
-        </WindowLayout>
-
         {/* NOTES */}
         <WindowLayout
           id="notes"
@@ -133,9 +131,22 @@ export default function Desktop() {
         >
           <NotesApp />
         </WindowLayout>
+
+        {/* SIRI */}
+        <WindowLayout
+          id="siri"
+          title="Siri"
+          dockId="dock-icon-siri"
+          isOpen={windows.siri.isOpen} isMinimized={windows.siri.isMinimized}
+          onClose={() => closeApp('siri')} onMinimize={() => toggleApp('siri')} onFocus={() => bringToFront('siri')}
+          zIndex={windows.siri.z} width={400} height={500}
+        >
+          <SiriApp onOpenApp={openApp} />
+        </WindowLayout>
+
       </div>
 
-      {/* 3. Dock sits outside the boundary so it stays on top visually, but windows can go behind it */}
+      {/* 3. Dock */}
       <DockLayout onOpenApp={toggleApp} openApps={Object.fromEntries(Object.entries(windows).map(([k, v]) => [k, v.isOpen && !v.isMinimized]))} />
     </main>
   );

@@ -13,7 +13,7 @@ export const dockApps: AppConfig[] = [
   { id: 'mail', name: 'Mail', icon: '/icons/Mail.png' },
   { id: 'photos', name: 'Photos', icon: '/icons/Photos.png' },
   { id: 'terminal', name: 'Terminal', icon: '/icons/Terminal.png' },
-  { id: 'vscode', name: 'VS Code', icon: '/icons/VSCode.svg' },
+  { id: 'vscode', name: 'VS Code', icon: '/icons/vsCode.svg' },
   { id: 'music', name: 'Music', icon: '/icons/Music.png' },
   { id: 'system', name: 'Settings', icon: '/icons/System.png' },
   { id: 'calculator', name: 'Calculator', icon: '/icons/Calculator.png' },

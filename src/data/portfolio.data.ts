@@ -4,10 +4,10 @@ import contactDetails from "./contactDetails";
 export const profileData = {
   name: 'Md Zayed Ghanchi',
   location: 'Kharagpur, India',
-  education: 'Aerospace Eng. @ IIT Kharagpur',
-  focus: 'SDE & DevOps',
+  education: '2nd Year UG @ IIT Kharagpur',
+  focus: 'SDE & Web Developments',
   role: 'Full Stack Developer',
-  bio: '2nd year Aero student obsessed with software.',
+  bio: 'Undergraduate student at IIT Kharagpur. Always learning, building, and pushing code.',
   specialization: 'React, Next.js & Modern UI',
   status: 'Working as Front end Developer at @COMPANY',
   contact: {
@@ -16,11 +16,22 @@ export const profileData = {
     linkedin: contactDetails.linkedin
   },
   techStack: [
+    'React',
     'Next.js',
+    'TypeScript',
+    'Tailwind',
+    'Node.js',
+    'MongoDB',
+    'Express',
     'MERN Stack',
-    'FastAPI',
+  ],
+  currently_exploring: [
+    'Docker',
+    'PostgreSQL',
     'AWS',
-    'Agentic AI'
+    'FastAPI',
+    'Firebase',
+    'Supabase'
   ]
 };
 
@@ -58,17 +69,27 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
-    title: "Full Stack Intern",
-    company: "TechCorp Inc.",
+    title: "Front End Intern",
+    company: "Company XYZ",
     status: "Present",
-    description: "Spearheading the migration of legacy code to modern React architecture. Optimized database queries in PostgreSQL reducing latency by 40%.",
-    technologies: ["React", "FastAPI", "PostgreSQL"]
+    description: "Creating Responsive websites constituting charts of various metrics of company. Handling huge data and optimizing the website for better performance and user experience.",
+    technologies: ["React", "Tailwind"]
   },
   {
-    title: "Frontend Freelancer",
-    company: "Self Employed",
-    status: "2024",
-    description: "Delivered high-performance marketing sites and dashboards. Focused on pixel-perfect implementations of Figma designs.",
-    technologies: ["Next.js", "Tailwind"]
+    title: "Tech Team Member",
+    company: "NSSC IIT Kharagpur",
+    status: "2024-2025",
+    description: "Contributed to the development of the official NSSC website using Next.js and Modern UI. Improved user engagement by implementing responsive design principles.",
+    technologies: ["Next.js", "Modern UI"]
   }
+];
+
+export interface Projects {
+  name: string;
+  description: string;
+  technologies: string[];
+}
+
+export const projects: Projects[] = [
+  // Projects can be added here in the future
 ];
