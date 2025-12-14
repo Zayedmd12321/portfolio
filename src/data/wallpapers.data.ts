@@ -1,5 +1,5 @@
 // Wallpaper configuration
-export const wallpapers = [1, 2, 3, 4, 5].map(id => ({
+export const wallpapers = [1, 2, 3, 4, 5, 6, 7].map(id => ({
   id,
   path: `/wallpapers/${id}.jpg`,
   alt: `Wallpaper ${id}`

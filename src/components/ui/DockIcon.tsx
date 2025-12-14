@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, MotionValue } from 'framer-motion';
 
-const BASE_WIDTH = 60;
+const BASE_WIDTH = 65;
 const MAX_WIDTH = 110;
 const DISTANCE_THRESHOLD = 160;
 

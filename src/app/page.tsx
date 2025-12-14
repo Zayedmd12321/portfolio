@@ -9,6 +9,7 @@ import VSCodeApp from '@/components/apps/VSCodeApp';
 import SafariApp from '@/components/apps/SafariApp';
 import NotesApp from '@/components/apps/NotesApp';
 import FinderApp from '@/components/apps/FinderApp';
+import { resume } from 'react-dom/server';
 
 export default function Desktop() {
   const [windows, setWindows] = useState({
@@ -17,10 +18,12 @@ export default function Desktop() {
     vscode: { isOpen: false, isMinimized: false, z: 3 },
     safari: { isOpen: false, isMinimized: false, z: 4 },
     calculator: { isOpen: false, isMinimized: false, z: 5 },
-    messages: { isOpen: false, isMinimized: false, z: 6 },
+    siri: { isOpen: false, isMinimized: false, z: 6 },
     photos: { isOpen: false, isMinimized: false, z: 7 },
     contacts: { isOpen: false, isMinimized: false, z: 8 },
     notes: { isOpen: true, isMinimized: false, z: 9 },
+    bin: { isOpen: false, isMinimized: false, z: 10 },
+    resume: { isOpen: false, isMinimized: false, z: 11 },
   });
 
   const bringToFront = (id: string) => {
@@ -46,7 +49,7 @@ export default function Desktop() {
   };
 
   return (
-    <main className="w-screen h-screen overflow-hidden relative bg-[url('/wallpapers/macos-ventura.jpg')] bg-cover bg-center">
+    <main className="w-screen h-screen overflow-hidden relative">
 
       {/* 1. MenuBar sits at the top (Z-index high to stay above windows if they maximize) */}
       <div className="absolute top-0 left-0 w-full z-50">
@@ -126,7 +129,7 @@ export default function Desktop() {
           dockId="dock-icon-notes"
           isOpen={windows.notes.isOpen} isMinimized={windows.notes.isMinimized}
           onClose={() => closeApp('notes')} onMinimize={() => toggleApp('notes')} onFocus={() => bringToFront('notes')}
-          zIndex={windows.notes.isMinimized ? windows.notes.z : 100000} width={'60%'} height={'80%'} x={5} y={5} sidebar={true}
+          zIndex={windows.notes.z} width={'60%'} height={'80%'} x={5} y={5} sidebar={true}
         >
           <NotesApp />
         </WindowLayout>

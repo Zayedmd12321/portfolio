@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion, useMotionValue } from 'framer-motion';
 import { DockIcon } from '@/components/ui/DockIcon';
 import { dockApps } from '@/data/apps.data';
@@ -8,6 +8,22 @@ interface DockLayoutProps {
   onOpenApp: (id: string) => void;
   openApps: Record<string, boolean>;
 }
+
+// Define the items that sit on the right side of the divider
+const dockExtras = [
+  { 
+    id: 'resume', 
+    name: 'Resume', 
+    icon: '/icons/resume.png', // Make sure this icon exists in public/icons
+    action: () => window.open('/resume.pdf', '_blank') 
+  },
+  { 
+    id: 'trash', 
+    name: 'Bin', 
+    icon: '/icons/Trash Full.png', // Make sure this icon exists in public/icons
+    action: () => console.log('Open Trash') 
+  },
+];
 
 export default function DockLayout({ onOpenApp, openApps }: DockLayoutProps) {
   const mouseX = useMotionValue(Infinity);
@@ -19,6 +35,7 @@ export default function DockLayout({ onOpenApp, openApps }: DockLayoutProps) {
         onMouseLeave={() => mouseX.set(Infinity)}
         className="flex h-[90px] items-end gap-3 rounded-2xl bg-white/10 border border-white/20 px-3 pb-2 backdrop-blur-2xl shadow-2xl"
       >
+        {/* --- Left Side: Main Apps --- */}
         {dockApps.map((app) => (
           <DockIcon
             key={app.id}
@@ -28,6 +45,22 @@ export default function DockLayout({ onOpenApp, openApps }: DockLayoutProps) {
             name={app.name}
             isOpen={openApps[app.id]}
             onClick={() => onOpenApp(app.id)}
+          />
+        ))}
+
+        {/* --- Separator --- */}
+        <div className="h-15 w-px bg-black/20 mx-1 mb-2 border-r border-black/10" />
+
+        {/* --- Right Side: Extras (Resume, Trash) --- */}
+        {dockExtras.map((item) => (
+          <DockIcon
+            key={item.id}
+            id={item.id}
+            mouseX={mouseX}
+            src={item.icon}
+            name={item.name}
+            isOpen={false} // Usually these don't show the "open" dot indicator
+            onClick={item.action}
           />
         ))}
       </motion.div>

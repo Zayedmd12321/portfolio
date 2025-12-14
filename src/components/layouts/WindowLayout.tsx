@@ -32,6 +32,13 @@ export default function WindowLayout({
   const [size, setSize] = useState({ width, height });
   const [dockDelta, setDockDelta] = useState({ x: 0, y: 0 });
 
+  // Reset maximized state when window is minimized or closed
+  useEffect(() => {
+    if (isMinimized || !isOpen) {
+      setIsMaximized(false);
+    }
+  }, [isMinimized, isOpen]);
+
   useEffect(() => {
     if (!isOpen && !isMinimized) return;
 

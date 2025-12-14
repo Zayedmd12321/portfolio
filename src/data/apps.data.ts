@@ -9,7 +9,7 @@ export const dockApps: AppConfig[] = [
   { id: 'finder', name: 'Finder', icon: '/icons/Finder.png' },
   { id: 'safari', name: 'Safari', icon: '/icons/Safari.png' },
   { id: 'notes', name: 'Notes', icon: '/icons/Notes.png' },
-  { id: 'messages', name: 'Messages', icon: '/icons/Messages.png' },
+  { id: 'siri', name: 'Siri', icon: '/icons/Siri.png' },
   { id: 'mail', name: 'Mail', icon: '/icons/Mail.png' },
   { id: 'photos', name: 'Photos', icon: '/icons/Photos.png' },
   { id: 'terminal', name: 'Terminal', icon: '/icons/Terminal.png' },

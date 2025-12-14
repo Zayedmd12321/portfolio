@@ -1,3 +1,5 @@
+import contactDetails from "./contactDetails";
+
 // Portfolio/Profile information
 export const profileData = {
   name: 'Md Zayed Ghanchi',
@@ -9,9 +11,9 @@ export const profileData = {
   specialization: 'React, Next.js & Modern UI',
   status: 'Working as Front end Developer at @COMPANY',
   contact: {
-    email: 'email@example.com',
-    github: 'https://github.com',
-    linkedin: 'https://linkedin.com'
+    email: contactDetails.email,
+    github: contactDetails.github,
+    linkedin: contactDetails.linkedin
   },
   techStack: [
     'Next.js',
