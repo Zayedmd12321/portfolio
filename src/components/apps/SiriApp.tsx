@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, User, Code, Terminal, Smile, ArrowRight } from 'lucide-react';
+import { Sparkles, User, Code, Terminal, Smile, ArrowUp, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Types ---
@@ -16,11 +16,42 @@ interface SiriAppProps {
 
 // --- Suggestions Data ---
 const SUGGESTIONS = [
-  { icon: User, label: "Who is Zayed?", prompt: "Who is Zayed Ghanchi and what does he do?" },
-  { icon: Code, label: "Show Portfolio", prompt: "Show me Zayed's portfolio projects." },
-  { icon: Terminal, label: "Zayed's Skills", prompt: "What are Zayed's technical skills?" },
-  { icon: Smile, label: "Tell me a joke", prompt: "Tell me a joke about coding." },
+  { icon: User, label: "Who is Zayed?", prompt: "Who is Zayed Ghanchi and what does he do?", color: "text-cyan-400" },
+  { icon: Code, label: "Projects", prompt: "Show me Zayed's portfolio projects.", color: "text-purple-400" },
+  { icon: Terminal, label: "Tech Stack", prompt: "What are Zayed's technical skills?", color: "text-emerald-400" },
+  { icon: Smile, label: "Fun Fact", prompt: "Tell me a joke about coding.", color: "text-yellow-400" },
 ];
+
+// --- Sub-Component: The Apple Intelligence Mesh Orb ---
+const SiriOrb = ({ isActive }: { isActive: boolean }) => {
+  return (
+    <div className="relative w-24 h-24 flex items-center justify-center">
+      {/* Liquid Background Layers */}
+      <motion.div 
+        animate={{ 
+          scale: isActive ? [1, 1.2, 1] : [1, 1.05, 1],
+          rotate: [0, 180, 360],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 blur-2xl opacity-50 mix-blend-screen"
+      />
+      <motion.div 
+        animate={{ 
+          scale: isActive ? [1.1, 1.3, 1.1] : [0.9, 1.1, 0.9],
+          rotate: [360, 180, 0],
+        }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-500 blur-2xl opacity-40 mix-blend-screen"
+      />
+      
+      {/* Core Icon */}
+      <div className="relative z-10 w-16 h-16 rounded-full bg-black/20 backdrop-blur-xl border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-50" />
+        <Sparkles className={`w-8 h-8 text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] ${isActive ? 'animate-pulse' : ''}`} />
+      </div>
+    </div>
+  );
+};
 
 export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
   const [input, setInput] = useState('');
@@ -38,7 +69,6 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
     }
   }, [history, isLoading]);
 
-  // Handle Sending Messages
   const handleSend = async (textOverride?: string) => {
     const messageToSend = textOverride || input.trim();
     if (!messageToSend) return;
@@ -46,7 +76,6 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
     setInput('');
     setIsLoading(true);
 
-    // Optimistic UI Update
     const newHistory: ChatMessage[] = [
       ...history,
       { role: 'user', parts: [{ text: messageToSend }] }
@@ -57,40 +86,28 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
       const response = await fetch('/api/siri', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: messageToSend,
-          history: history 
-        }),
+        body: JSON.stringify({ message: messageToSend, history: history }),
       });
 
       const data = await response.json();
 
       if (data.reply) {
-        // App Opening Logic (JSON parsing)
         const appMatch = data.reply.match(/\{"action":\s*"open_app",\s*"app":\s*"([^"]+)"\}/);
         
         if (appMatch && onOpenApp) {
           const appId = appMatch[1];
           onOpenApp(appId);
-          
           const cleanReply = data.reply.replace(/\{"action":.*?\}/, '').trim();
-          setHistory(prev => [
-            ...prev,
-            { role: 'model', parts: [{ text: cleanReply || `Opening ${appId} for you...` }] }
-          ]);
+          setHistory(prev => [...prev, { role: 'model', parts: [{ text: cleanReply || `Opening ${appId}...` }] }]);
         } else {
-          setHistory(prev => [
-            ...prev,
-            { role: 'model', parts: [{ text: data.reply }] }
-          ]);
+          setHistory(prev => [...prev, { role: 'model', parts: [{ text: data.reply }] }]);
         }
       }
     } catch (error) {
-      console.error("Connection error", error);
-      setHistory(prev => [
-        ...prev,
-        { role: 'model', parts: [{ text: "I'm having trouble connecting to the network right now." }] }
-      ]);
+        // Fallback for demo if API fails
+        setTimeout(() => {
+             setHistory(prev => [...prev, { role: 'model', parts: [{ text: "I'm in demo mode (API disconnected). But I'd normally answer that!" }] }]);
+        }, 1000);
     } finally {
       setIsLoading(false);
     }
@@ -101,57 +118,58 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#1e1e1e]/80 backdrop-blur-3xl text-white font-sans overflow-hidden relative selection:bg-blue-500/30">
+    <div className="flex flex-col h-full w-full bg-[#121212]/90 backdrop-blur-3xl font-sans overflow-hidden relative shadow-2xl border border-white/10 rounded-xl">
       
-      {/* --- Ambient Background Glows --- */}
-      <div className="absolute top-[-20%] left-[-20%] w-[50%] h-[50%] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-20%] w-[50%] h-[50%] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none" />
+      {/* --- Apple Intelligence Ambient Glow --- */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+         <motion.div 
+            animate={{ opacity: [0.3, 0.5, 0.3], scale: [1, 1.1, 1] }}
+            transition={{ duration: 8, repeat: Infinity }}
+            className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/30 rounded-full blur-[100px]" 
+         />
+         <motion.div 
+            animate={{ opacity: [0.3, 0.5, 0.3], scale: [1, 1.2, 1] }}
+            transition={{ duration: 10, repeat: Infinity, delay: 1 }}
+            className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/30 rounded-full blur-[100px]" 
+         />
+      </div>
 
-      {/* --- Header: Siri Orb & Title --- */}
-      <div className="h-32 shrink-0 flex flex-col items-center justify-center relative z-10 border-b border-white/5 bg-gradient-to-b from-white/5 to-transparent">
-        
-        {/* The "Apple Intelligence" Liquid Orb Animation */}
-        <div className="relative w-16 h-16 flex items-center justify-center">
-          <motion.div 
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-500 via-blue-500 to-purple-600 blur-xl opacity-60"
-          />
-          <motion.div 
-             animate={{ scale: isLoading ? [1, 1.2, 1] : 1 }}
-             transition={{ duration: 2, repeat: Infinity }}
-             className="relative z-10 w-12 h-12 rounded-full bg-gradient-to-br from-white/20 to-white/5 border border-white/20 backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.2)] flex items-center justify-center"
-          >
-             <Sparkles className={`w-6 h-6 text-white ${isLoading ? 'animate-pulse' : ''}`} />
-          </motion.div>
-        </div>
-
-        <h2 className="mt-3 text-sm font-medium text-white/90 tracking-wide flex items-center gap-2">
-          Siri <span className="text-white/30">•</span> Portfolio Manager
-        </h2>
+      {/* --- Header: Siri Orb --- */}
+      <div className="shrink-0 flex flex-col items-center justify-center pt-8 pb-4 relative z-10">
+        <SiriOrb isActive={isLoading} />
+        <motion.h2 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4 text-sm font-medium text-white/80 tracking-wide flex items-center gap-2"
+        >
+          Siri <span className="w-1 h-1 rounded-full bg-white/30" /> AI Portfolio
+        </motion.h2>
       </div>
 
       {/* --- Chat Area --- */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-6 macos-scrollbar relative z-10">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-6 relative z-10 macos-scrollbar">
         
-        {/* Welcome / Empty State Suggestions */}
+        {/* Welcome Suggestions */}
         {history.length === 0 && (
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
             className="flex flex-col items-center justify-center h-full pb-10"
           >
-            <p className="text-white/40 mb-8 text-sm font-light">Choose a topic to get started</p>
             <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
               {SUGGESTIONS.map((suggestion, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSend(suggestion.prompt)}
-                  className="group flex flex-col items-start gap-2 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300 text-left"
+                  className="group relative flex flex-col items-start gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300 overflow-hidden"
                 >
-                  <suggestion.icon className="w-5 h-5 text-blue-400 group-hover:text-blue-300 transition-colors" />
-                  <span className="text-xs text-white/80 font-medium">{suggestion.label}</span>
+                  <div className={`p-2 rounded-full bg-white/5 ${suggestion.color} group-hover:scale-110 transition-transform`}>
+                    <suggestion.icon size={18} />
+                  </div>
+                  <span className="text-xs text-white/90 font-medium tracking-wide">{suggestion.label}</span>
+                  
+                  {/* Hover Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               ))}
             </div>
@@ -159,18 +177,18 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
         )}
 
         {/* Message History */}
-        <AnimatePresence>
+        <AnimatePresence mode='popLayout'>
           {history.map((msg, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[85%] p-4 rounded-2xl text-[14px] leading-relaxed shadow-lg backdrop-blur-md ${
+              <div className={`max-w-[85%] px-5 py-3.5 text-[14px] leading-relaxed shadow-sm backdrop-blur-xl ${
                 msg.role === 'user' 
-                  ? 'bg-blue-600/80 text-white rounded-br-sm border border-blue-500/30' 
-                  : 'bg-[#2a2a2a]/60 text-gray-100 rounded-bl-sm border border-white/10'
+                  ? 'bg-[#007AFF] text-white rounded-2xl rounded-br-sm' 
+                  : 'bg-[#333]/70 text-gray-100 rounded-2xl rounded-bl-sm border border-white/10'
               }`}>
                 {msg.parts[0].text}
               </div>
@@ -180,44 +198,46 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
 
         {/* Loading Indicator */}
         {isLoading && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }}
-            className="flex justify-start"
-          >
-             <div className="bg-[#2a2a2a]/60 border border-white/10 px-4 py-3 rounded-2xl rounded-bl-sm flex gap-1.5 items-center backdrop-blur-md">
-                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" />
-                <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce delay-100" />
-                <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce delay-200" />
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex justify-start">
+             <div className="bg-[#333]/70 border border-white/10 px-4 py-3 rounded-2xl rounded-bl-sm flex gap-1.5 items-center backdrop-blur-md">
+                <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-[bounce_1.4s_infinite_0ms]" />
+                <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-[bounce_1.4s_infinite_200ms]" />
+                <span className="w-1.5 h-1.5 bg-pink-400 rounded-full animate-[bounce_1.4s_infinite_400ms]" />
              </div>
           </motion.div>
         )}
       </div>
 
-      {/* --- Input Area --- */}
-      <div className="p-4 bg-gradient-to-t from-black/40 to-transparent z-20">
+      {/* --- Floating Input Area --- */}
+      <div className="p-5 relative z-20">
         <div className="relative flex items-center group">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            placeholder="Ask anything..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-5 pr-12 text-sm text-white placeholder-white/30 focus:outline-none focus:bg-white/10 focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all shadow-inner backdrop-blur-xl"
-          />
-          <button 
-            onClick={() => handleSend()}
-            disabled={!input.trim() || isLoading}
-            className="absolute right-2 p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 disabled:opacity-0 disabled:scale-75 transition-all duration-300 transform"
-          >
-            {isLoading ? <span className="w-4 h-4 block rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <ArrowRight size={16} />}
-          </button>
+            {/* Input Glow Effect */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl opacity-0 group-focus-within:opacity-30 blur-md transition-opacity duration-500" />
+            
+            <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isLoading}
+                placeholder="Ask Siri..."
+                className="relative w-full bg-[#1c1c1c]/80 border border-white/10 rounded-2xl py-4 pl-5 pr-12 text-sm text-white placeholder-white/20 focus:outline-none focus:bg-[#252525] focus:border-white/20 transition-all shadow-inner backdrop-blur-xl"
+            />
+            
+            <button 
+                onClick={() => handleSend()}
+                disabled={!input.trim() || isLoading}
+                className="absolute right-2 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white disabled:opacity-0 disabled:scale-75 transition-all duration-200"
+            >
+                {isLoading ? (
+                    <Zap className="w-4 h-4 text-yellow-400 animate-pulse" />
+                ) : (
+                    <ArrowUp className="w-4 h-4" />
+                )}
+            </button>
         </div>
-        <p className="text-center text-[10px] text-white/20 mt-2 font-light tracking-wider">
-          AI-POWERED PORTFOLIO ASSISTANT
-        </p>
       </div>
+      
     </div>
   );
 }
