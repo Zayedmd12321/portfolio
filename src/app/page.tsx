@@ -9,7 +9,8 @@ import VSCodeApp from '@/components/apps/VSCodeApp';
 import SafariApp from '@/components/apps/SafariApp';
 import NotesApp from '@/components/apps/NotesApp';
 import FinderApp from '@/components/apps/FinderApp';
-import SiriApp from '@/components/apps/SiriApp'; // Import the new component
+import SiriApp from '@/components/apps/SiriApp';
+import ResumeApp from '@/components/apps/ResumeApp';
 
 export default function Desktop() {
   const [windows, setWindows] = useState({
@@ -139,9 +140,33 @@ export default function Desktop() {
           dockId="dock-icon-siri"
           isOpen={windows.siri.isOpen} isMinimized={windows.siri.isMinimized}
           onClose={() => closeApp('siri')} onMinimize={() => toggleApp('siri')} onFocus={() => bringToFront('siri')}
-          zIndex={windows.siri.z} width={400} height={500}
+          zIndex={windows.siri.z} width={400} height={600}
         >
           <SiriApp onOpenApp={openApp} />
+        </WindowLayout>
+
+        {/* RESUME */}
+        <WindowLayout
+          id="resume"
+          title="Resume - Md Zayed Ghanchi"
+          dockId="dock-icon-resume"
+          isOpen={windows.resume.isOpen} isMinimized={windows.resume.isMinimized}
+          onClose={() => closeApp('resume')} onMinimize={() => toggleApp('resume')} onFocus={() => bringToFront('resume')}
+          zIndex={windows.resume.z} width={'40%'} height={'70%'}
+        >
+          <ResumeApp />
+        </WindowLayout>
+
+        {/* Calculator */}
+        <WindowLayout
+          id="calculator"
+          title="Calculator"
+          dockId="dock-icon-calculator"
+          isOpen={windows.calculator.isOpen} isMinimized={windows.calculator.isMinimized}
+          onClose={() => closeApp('calculator')} onMinimize={() => toggleApp('calculator')} onFocus={() => bringToFront('calculator')}
+          zIndex={windows.calculator.z} width={300} height={550}
+        >
+          <CalculatorApp />
         </WindowLayout>
 
       </div>

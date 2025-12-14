@@ -9,24 +9,24 @@ interface DockLayoutProps {
   openApps: Record<string, boolean>;
 }
 
-// Define the items that sit on the right side of the divider
-const dockExtras = [
-  { 
-    id: 'resume', 
-    name: 'Resume', 
-    icon: '/icons/resume.png', // Make sure this icon exists in public/icons
-    action: () => window.open('/resume.pdf', '_blank') 
-  },
-  { 
-    id: 'trash', 
-    name: 'Bin', 
-    icon: '/icons/Trash Full.png', // Make sure this icon exists in public/icons
-    action: () => console.log('Open Trash') 
-  },
-];
-
 export default function DockLayout({ onOpenApp, openApps }: DockLayoutProps) {
   const mouseX = useMotionValue(Infinity);
+
+  // ✅ MOVED INSIDE: So we can access 'onOpenApp' and 'openApps'
+  const dockExtras = [
+    { 
+      id: 'resume', 
+      name: 'Resume', 
+      icon: '/icons/resume.png', 
+      action: () => onOpenApp('resume') 
+    },
+    { 
+      id: 'trash', 
+      name: 'Bin', 
+      icon: '/icons/Trash Full.png', 
+      action: () => console.log('Open Trash') 
+    },
+  ];
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto">
@@ -59,7 +59,7 @@ export default function DockLayout({ onOpenApp, openApps }: DockLayoutProps) {
             mouseX={mouseX}
             src={item.icon}
             name={item.name}
-            isOpen={false} // Usually these don't show the "open" dot indicator
+            isOpen={openApps[item.id] || false} 
             onClick={item.action}
           />
         ))}
