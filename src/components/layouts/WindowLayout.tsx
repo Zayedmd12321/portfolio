@@ -20,11 +20,13 @@ interface WindowLayoutProps {
   y?: number;
   sidebar?: boolean;
   dockId?: string;
+  minWidth?: number;
+  minHeight?: number;
 }
 
 export default function WindowLayout({
   id, title, isOpen, isMinimized, onClose, onMinimize, onFocus, zIndex, children,
-  width = 800, height = 600, x = 100, y = 50, sidebar = false, dockId
+  width = 800, height = 600, x = 100, y = 50, sidebar = false, dockId, minWidth = 350, minHeight = 250
 }: WindowLayoutProps) {
   const [isHoveringLights, setIsHoveringLights] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -116,8 +118,8 @@ export default function WindowLayout({
       {(isOpen || isMinimized) && (
         <Rnd
           default={{ x: 100, y: 50, width, height }}
-          minWidth={350}
-          minHeight={250}
+          minWidth={minWidth}
+          minHeight={minHeight}
           bounds={isMaximized ? undefined : "parent"}
           dragHandleClassName="window-header"
           onMouseDown={onFocus}

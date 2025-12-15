@@ -11,10 +11,13 @@ import NotesApp from '@/components/apps/NotesApp';
 import FinderApp from '@/components/apps/FinderApp';
 import SiriApp from '@/components/apps/SiriApp';
 import ResumeApp from '@/components/apps/ResumeApp';
+import MailApp from '@/components/apps/MailApp';
 import Notification from '@/components/ui/Notification';
 import MusicApp from '@/components/apps/MusicApp';
+import { NotificationProvider, useNotification } from '@/context/NotificationContext';
 
-export default function Desktop() {
+function DesktopContent() {
+  const { showNotification } = useNotification();
   const [windows, setWindows] = useState({
     finder: { isOpen: false, isMinimized: false, z: 1 },
     terminal: { isOpen: false, isMinimized: false, z: 2 },
@@ -28,6 +31,7 @@ export default function Desktop() {
     bin: { isOpen: false, isMinimized: false, z: 10 },
     resume: { isOpen: false, isMinimized: false, z: 11 },
     music: { isOpen: false, isMinimized: false, z: 12 },
+    mail: { isOpen: false, isMinimized: false, z: 13 },
   });
 
   // State to track if the component has mounted on the client
@@ -38,6 +42,18 @@ export default function Desktop() {
     notes: { width: 800, height: 600, x: 50, y: 50 },
     siri: { width: 400, height: 600, x: 860, y: 50 }
   });
+
+  // Show welcome notification after mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      showNotification(
+        'System Online',
+        "Explore Zayed's Portfolio. Check the Dock for apps or ask Siri for insights.",
+        'system'
+      );
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // --- LAYOUT CALCULATION LOGIC ---
   const calculateLayout = () => {
@@ -244,14 +260,33 @@ export default function Desktop() {
           dockId="dock-icon-music"
           isOpen={windows.music.isOpen} isMinimized={windows.music.isMinimized}
           onClose={() => closeApp('music')} onMinimize={() => toggleApp('music')} onFocus={() => bringToFront('music')}
-          zIndex={windows.music.z} width={600} height={400}
+          zIndex={windows.music.z} minWidth={900} width={'40%'} minHeight={500} height={'30%'}
         >
           <MusicApp />
+        </WindowLayout>
+
+        <WindowLayout
+          id="mail"
+          title="Mail"
+          dockId="dock-icon-mail"
+          isOpen={windows.mail.isOpen} isMinimized={windows.mail.isMinimized}
+          onClose={() => closeApp('mail')} onMinimize={() => toggleApp('mail')} onFocus={() => bringToFront('mail')}
+          zIndex={windows.mail.z} width={900} height={600} sidebar={true}
+        >
+          <MailApp />
         </WindowLayout>
 
       </div>
 
       <DockLayout onOpenApp={toggleApp} openApps={Object.fromEntries(Object.entries(windows).map(([k, v]) => [k, v.isOpen && !v.isMinimized]))} />
     </main>
+  );
+}
+
+export default function Desktop() {
+  return (
+    <NotificationProvider>
+      <DesktopContent />
+    </NotificationProvider>
   );
 }

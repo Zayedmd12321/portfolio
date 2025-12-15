@@ -1,24 +1,47 @@
 'use client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { Sparkles, Command } from 'lucide-react';
+import { Sparkles, Command, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNotification } from '@/context/NotificationContext';
 
 export default function Notification() {
-  const [visible, setVisible] = useState(false);
+  const { isVisible, notification } = useNotification();
 
-  useEffect(() => {
-    // Show notification shortly after load
-    const timer = setTimeout(() => setVisible(true), 2000);
-    
-    // Auto-dismiss after 7 seconds
-    const hideTimer = setTimeout(() => setVisible(false), 9000);
-    
-    return () => { clearTimeout(timer); clearTimeout(hideTimer); };
-  }, []);
+  // Don't render if no notification or not visible
+  if (!notification || !isVisible) return null;
+
+  // Dynamic styling based on notification type
+  const getTypeStyles = () => {
+    switch (notification.type) {
+      case 'success':
+        return {
+          gradient: 'from-emerald-600 to-green-500',
+          shadow: 'rgba(16,185,129,0.3)',
+          icon: CheckCircle,
+          label: 'Success'
+        };
+      case 'error':
+        return {
+          gradient: 'from-red-600 to-orange-500',
+          shadow: 'rgba(239,68,68,0.3)',
+          icon: AlertCircle,
+          label: 'Error'
+        };
+      default: // 'system'
+        return {
+          gradient: 'from-blue-600 to-cyan-500',
+          shadow: 'rgba(59,130,246,0.3)',
+          icon: Sparkles,
+          label: 'System'
+        };
+    }
+  };
+
+  const typeStyles = getTypeStyles();
+  const Icon = typeStyles.icon;
 
   return (
     <AnimatePresence>
-      {visible && (
+      {isVisible && (
         <motion.div
           initial={{ opacity: 0, x: 20, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
@@ -35,11 +58,17 @@ export default function Notification() {
             {/* Icon Container */}
             <div className="relative z-10 shrink-0">
                <motion.div 
-                 animate={{ boxShadow: ["0 0 0px rgba(59,130,246,0)", "0 0 15px rgba(59,130,246,0.3)", "0 0 0px rgba(59,130,246,0)"] }}
+                 animate={{ 
+                   boxShadow: [
+                     `0 0 0px ${typeStyles.shadow.replace('0.3', '0')}`, 
+                     `0 0 15px ${typeStyles.shadow}`, 
+                     `0 0 0px ${typeStyles.shadow.replace('0.3', '0')}`
+                   ] 
+                 }}
                  transition={{ duration: 3, repeat: Infinity }}
-                 className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg border border-white/10"
+                 className={`w-12 h-12 rounded-xl bg-gradient-to-br ${typeStyles.gradient} flex items-center justify-center shadow-lg border border-white/10`}
                >
-                 <Sparkles className="text-white w-6 h-6 drop-shadow-md" />
+                 <Icon className="text-white w-6 h-6 drop-shadow-md" />
                </motion.div>
             </div>
 
@@ -47,15 +76,17 @@ export default function Notification() {
             <div className="flex flex-col justify-center z-10 flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-0.5 opacity-60">
                 <Command size={10} className="text-white" />
-                <span className="text-[10px] uppercase tracking-wider font-bold text-white">System</span>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-white">
+                  {typeStyles.label}
+                </span>
               </div>
               
               <h4 className="text-white text-[15px] font-semibold leading-tight mb-1">
-                System Online
+                {notification.title}
               </h4>
               
               <p className="text-white/70 text-[13px] leading-snug font-light">
-                Zayed's portfolio is ready. Check the <span className="text-blue-300 font-medium">Dock</span> for apps or ask <span className="text-purple-300 font-medium">Siri</span> for insights.
+                {notification.message}
               </p>
             </div>
 
