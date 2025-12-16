@@ -145,7 +145,7 @@ export default function WindowLayout({
             >
               {/* Header */}
               <div
-                className={`window-header shrink-0 flex items-center px-4 cursor-default select-none relative transition-colors duration-300 ${sidebar ? 'h-[52px] bg-transparent' : 'h-10 bg-[#2b2b2b] border-b border-black/40'}`}
+                className={`window-header shrink-0 flex items-center px-4 cursor-default select-none relative transition-colors duration-300 ${sidebar ? 'h-13 bg-transparent' : 'h-10 bg-[#2b2b2b] border-b border-black/40'}`}
                 onMouseEnter={() => setIsHoveringLights(true)}
                 onMouseLeave={() => setIsHoveringLights(false)}
                 onDoubleClick={() => setIsMaximized(!isMaximized)}

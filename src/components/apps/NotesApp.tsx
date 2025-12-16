@@ -97,7 +97,7 @@ export default function NotesApp() {
             transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
             className="bg-[#2d2d2d]/95 backdrop-blur-xl border-r border-black/50 shrink-0 h-full flex flex-col overflow-hidden whitespace-nowrap"
           >
-            <div className="w-[260px]">
+            <div className="w-65">
                 {/* Sidebar Header */}
                 <div className="h-14 flex items-center gap-2 px-4 shrink-0 pt-2 pb-2">
                   <div className="relative w-full group">
@@ -105,7 +105,7 @@ export default function NotesApp() {
                     <input 
                       type="text" placeholder="Search" value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-[#1c1c1c] rounded-[6px] py-1 pl-8 pr-3 text-[13px] text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#dcae48]/50 placeholder:text-gray-500 border border-white/5 shadow-inner transition-all"
+                      className="w-full bg-[#1c1c1c] rounded-md py-1 pl-8 pr-3 text-[13px] text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#dcae48]/50 placeholder:text-gray-500 border border-white/5 shadow-inner transition-all"
                     />
                   </div>
                   <button onClick={createNote} className="p-1.5 text-gray-400 hover:text-[#dcae48] hover:bg-white/5 rounded-md transition-all" title="Create New Note">
@@ -119,7 +119,7 @@ export default function NotesApp() {
                     <div 
                       key={note.id} onClick={() => setActiveNoteId(note.id)}
                       className={`
-                        group relative px-4 py-3 mx-1 rounded-[6px] cursor-pointer transition-all duration-100 select-none 
+                        group relative px-4 py-3 mx-1 rounded-md cursor-pointer transition-all duration-100 select-none
                         ${activeNoteId === note.id ? 'bg-[#dcae48] text-white' : 'hover:bg-white/5 text-gray-300'}
                       `}
                     >
@@ -235,7 +235,7 @@ function PortfolioSplitView() {
     return (
       <div ref={containerRef} className="flex w-full h-full divide-x divide-white/5 bg-[#1c1c1c]">
         {/* Profile: 28% */}
-        <div className="w-[31%] min-w-[300px] shrink-0 h-full overflow-y-auto macos-scrollbar p-8 bg-[#1e1e1e]/30">
+        <div className="w-[31%] min-w-75 shrink-0 h-full overflow-y-auto macos-scrollbar p-8 bg-[#1e1e1e]/30">
            <ProfileSection centered={true} />
         </div>
         {/* Experience: Flexible Middle */}
@@ -243,7 +243,7 @@ function PortfolioSplitView() {
            <ExperienceSection />
         </div>
         {/* Tech: 38% */}
-        <div className="w-[38%] min-w-[420px] shrink-0 h-full overflow-y-auto macos-scrollbar pl-6 pr-6 bg-[#1e1e1e]/30">
+        <div className="w-[38%] min-w-105 shrink-0 h-full overflow-y-auto macos-scrollbar pl-6 pr-6 bg-[#1e1e1e]/30">
            <TechSection columns={2} />
         </div>
       </div>
@@ -254,7 +254,7 @@ function PortfolioSplitView() {
   else if (width > 700) {
     return (
       <div ref={containerRef} className="flex w-full h-full divide-x divide-white/5 bg-[#1c1c1c]">
-        <div className="w-[42%] min-w-[380px] shrink-0 h-full pb-8 pr-8 pl-8 flex flex-col justify-center text-center bg-[#1e1e1e]/30 overflow-y-auto macos-scrollbar">
+        <div className="w-[42%] min-w-95 shrink-0 h-full pb-8 pr-8 pl-8 flex flex-col justify-center text-center bg-[#1e1e1e]/30 overflow-y-auto macos-scrollbar">
            <ProfileSection centered={true} />
         </div>
         
@@ -286,7 +286,7 @@ function ProfileSection({ centered }: { centered?: boolean }) {
   return (
     <div className={`space-y-6 ${centered ? 'flex flex-col items-center text-center' : ''} animate-in fade-in slide-in-from-bottom-4 duration-700 pt-8`}>
       <div className="relative group w-40 h-40">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#dcae48] to-purple-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+          <div className="absolute inset-0 rounded-full bg-linear-to-tr from-[#dcae48] to-purple-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
           <img src="/me.jpg" alt="Profile" className="relative w-full h-full rounded-full object-cover border-2 border-white/10 shadow-2xl z-10" />
       </div>
       
@@ -334,14 +334,14 @@ function ExperienceSection() {
       <div className="relative ml-3 space-y-0">
         
         {/* The Vertical Line (Gradient fade at bottom) */}
-        <div className="absolute left-0 top-2 bottom-0 w-px bg-gradient-to-b from-white/20 via-white/10 to-transparent" />
+        <div className="absolute left-0 top-2 bottom-0 w-px bg-linear-to-b from-white/20 via-white/10 to-transparent" />
 
         {experiences.map((exp, idx) => (
           <div key={idx} className="relative pl-8 pb-12 group">
             
             {/* Timeline Dot (Glows on hover) */}
             <div className={`
-              absolute left-[-4px] top-2.5 w-[9px] h-[9px] rounded-full border-2 border-[#1c1c1c] z-10 transition-all duration-300
+              absolute -left-1 top-2.5 w-2.25 h-2.25 rounded-full border-2 border-[#1c1c1c] z-10 transition-all duration-300
               ${exp.status === 'Present' ? 'bg-[#dcae48] shadow-[0_0_8px_rgba(220,174,72,0.6)]' : 'bg-gray-600 group-hover:bg-[#dcae48]'}
             `} />
 
@@ -381,7 +381,7 @@ function ExperienceSection() {
                 {exp.technologies.map((tech, techIdx) => (
                   <span 
                     key={techIdx} 
-                    className="text-[10px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-[4px] border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-default"
+                    className="text-[10px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-sm border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   >
                     {tech}
                   </span>

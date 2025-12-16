@@ -20,7 +20,7 @@ export function MenuButton({
     <div 
       onClick={onClick}
       className={`
-        px-2 h-[24px] rounded-[4px] flex items-center cursor-default transition-all duration-100 
+        px-2 h-6 rounded-sm flex items-center cursor-default transition-all duration-100 
         ${active ? 'bg-white/20' : 'hover:bg-white/10'}
         ${bold ? 'font-bold tracking-tight' : 'font-medium'}
       `}

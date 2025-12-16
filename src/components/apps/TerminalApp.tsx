@@ -169,7 +169,7 @@ export default function TerminalApp({ bootMode = false, onBootComplete }: Termin
             {/* 1. RENDER ASCII ART WITH TEXT GRADIENT */}
             {line.type === 'art' && (
                <span 
-                 className="font-bold tracking-widest bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent"
+                 className="font-bold tracking-widest bg-linear-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent"
                  style={{ 
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',

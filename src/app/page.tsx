@@ -139,7 +139,7 @@ function DesktopContent() {
   };
 
   return (
-    <main className="w-screen h-screen overflow-hidden relative selection:bg-blue-500/30">
+    <main className="w-screen h-screen relative selection:bg-blue-500/30">
       
       {/* 1. Boot Screen - Sits on top (z-[99999]) */}
       {showBootScreen && (
@@ -176,7 +176,7 @@ function DesktopContent() {
           <Notification />
 
           {/* Windows Area */}
-          <div className="absolute top-[36px] left-0 w-full h-[calc(100vh-30px)] z-10">
+          <div className="absolute top-9 left-0 w-full h-[calc(100vh-30px)]">
             
             <WindowLayout
               id="notes"
@@ -258,7 +258,7 @@ function DesktopContent() {
               dockId="dock-icon-terminal"
               isOpen={windows.terminal.isOpen} isMinimized={windows.terminal.isMinimized}
               onClose={() => closeApp('terminal')} onMinimize={() => toggleApp('terminal')} onFocus={() => bringToFront('terminal')}
-              zIndex={windows.terminal.z} width={600} height={400}
+              zIndex={windows.terminal.z} width={600} height={600}
             >
               <TerminalApp bootMode={terminalBootMode} onBootComplete={handleTerminalBootComplete} />
             </WindowLayout>

@@ -56,7 +56,7 @@ const BookmarkCard = ({ data, onClick }: { data: BookmarkItem; onClick: () => vo
     <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center text-white text-2xl shadow-md ${data.color} overflow-hidden`}>
       <span className="font-bold">{data.name.slice(0,2).toUpperCase()}</span>
     </div>
-    <span className="text-xs text-gray-500 font-medium group-hover:text-blue-500 text-center max-w-[80px] truncate">
+    <span className="text-xs text-gray-500 font-medium group-hover:text-blue-500 text-center max-w-20 truncate">
       {data.name}
     </span>
   </div>
@@ -308,7 +308,7 @@ export default function SafariApp() {
                 key={tab.id}
                 onClick={() => setActiveTabId(tab.id)}
                 className={`
-                  group relative flex items-center justify-between min-w-[120px] max-w-[200px] h-8 px-3 rounded-t-lg text-xs font-medium cursor-pointer select-none transition-all
+                  group relative flex items-center justify-between min-w-30 max-w-50 h-8 px-3 rounded-t-lg text-xs font-medium cursor-pointer select-none transition-all
                   ${activeTabId === tab.id 
                     ? 'bg-white text-black shadow-sm z-10' 
                     : 'bg-[#DFDFE1] text-gray-500 hover:bg-[#EBEBEC]'}
@@ -383,7 +383,7 @@ export default function SafariApp() {
 
                  {/* Blue Progress Bar */}
                  {activeTab.isLoading && (
-                   <div className="absolute bottom-0 left-0 h-[2px] bg-blue-500 animate-[loading_2s_ease-in-out_infinite] w-full opacity-80 z-0" />
+                   <div className="absolute bottom-0 left-0 h-0.5 bg-blue-500 animate-[loading_2s_ease-in-out_infinite] w-full opacity-80 z-0" />
                  )}
               </div>
             </div>
@@ -466,7 +466,7 @@ export default function SafariApp() {
                 /* --- Favorites / Start Page --- */
                 <div className="w-full h-full flex flex-col items-center pt-20 animate-in fade-in duration-300 bg-[#FBFBFD] overflow-y-auto">
                    <div className="mb-12 text-center select-none">
-                      <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-gray-400 to-gray-200 mb-2">Favorites</h1>
+                      <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-linear-to-br from-gray-400 to-gray-200 mb-2">Favorites</h1>
                       <p className="text-gray-400 text-sm">Top Sites</p>
                    </div>
                    

@@ -73,7 +73,7 @@ export default function MenuBarLayout() {
   }, []);
 
   return (
-    <div className="fixed top-0 w-full h-[36px] z-[9999] bg-black/20 backdrop-blur-xl border-b border-white/5 text-white shadow-sm select-none flex justify-between px-2 sm:px-4 items-center font-medium text-[13px]">
+    <div className="fixed top-0 w-full h-9 z-9999 bg-black/20 backdrop-blur-xl border-b border-white/5 text-white shadow-sm select-none flex justify-between px-2 sm:px-4 items-center font-medium text-[13px]">
       
       {/* Left Side */}
       <div className="flex items-center gap-1 sm:gap-4 h-full relative" ref={menuRef}>
@@ -113,7 +113,7 @@ export default function MenuBarLayout() {
                     <div className="relative">
                         <Battery size={20} className="text-gray-300" />
                         <div 
-                            className="absolute top-[6px] left-[2px] h-[8px] bg-white rounded-[1px]" 
+                            className="absolute top-1.5 left-0.5 h-2 bg-white rounded-[1px]" 
                             style={{ width: `${battery.level * 12}px` }} 
                         />
                     </div>
@@ -144,7 +144,7 @@ export default function MenuBarLayout() {
                             animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 10, x: 20 }}
                             transition={{ duration: 0.15, ease: "easeOut" }}
-                            className="absolute top-10 right-[-80px] sm:right-0 w-[300px] bg-[#1e1e1eb3] backdrop-blur-3xl border border-white/10 shadow-2xl rounded-2xl p-4 flex flex-col gap-4 z-[10000]"
+                            className="absolute top-10 -right-20 sm:right-0 w-75 bg-[#1e1e1eb3] backdrop-blur-3xl border border-white/10 shadow-2xl rounded-2xl p-4 flex flex-col gap-4 z-10000"
                         >
                             {/* Theme Toggle */}
                             <div className="flex flex-col gap-2">
@@ -190,7 +190,7 @@ export default function MenuBarLayout() {
             </div>
         </div>
 
-        <span className="text-[13px] font-medium min-w-[130px] text-right tabular-nums tracking-wide">
+        <span className="text-[13px] font-medium min-w-32.5 text-right tabular-nums tracking-wide">
             {time}
         </span>
       </div>

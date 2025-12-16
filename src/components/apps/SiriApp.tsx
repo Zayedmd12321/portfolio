@@ -33,7 +33,7 @@ const SiriOrb = ({ isActive }: { isActive: boolean }) => {
           rotate: [0, 180, 360],
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 blur-2xl opacity-50 mix-blend-screen"
+        className="absolute inset-0 rounded-full bg-linear-to-r from-cyan-500 via-blue-600 to-purple-600 blur-2xl opacity-50 mix-blend-screen"
       />
       <motion.div 
         animate={{ 
@@ -41,12 +41,12 @@ const SiriOrb = ({ isActive }: { isActive: boolean }) => {
           rotate: [360, 180, 0],
         }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-orange-400 to-yellow-500 blur-2xl opacity-40 mix-blend-screen"
+        className="absolute inset-0 rounded-full bg-linear-to-r from-pink-500 via-orange-400 to-yellow-500 blur-2xl opacity-40 mix-blend-screen"
       />
       
       {/* Core Icon */}
       <div className="relative z-10 w-16 h-16 rounded-full bg-black/20 backdrop-blur-xl border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-50" />
+        <div className="absolute inset-0 bg-linear-to-tr from-white/10 to-transparent opacity-50" />
         <Sparkles className={`w-8 h-8 text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] ${isActive ? 'animate-pulse' : ''}`} />
       </div>
     </div>
@@ -169,7 +169,7 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
                   <span className="text-xs text-white/90 font-medium tracking-wide">{suggestion.label}</span>
                   
                   {/* Hover Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               ))}
             </div>
@@ -212,7 +212,7 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
       <div className="p-5 relative z-20">
         <div className="relative flex items-center group">
             {/* Input Glow Effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl opacity-0 group-focus-within:opacity-30 blur-md transition-opacity duration-500" />
+            <div className="absolute -inset-0.5 bg-linear-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl opacity-0 group-focus-within:opacity-30 blur-md transition-opacity duration-500" />
             
             <input
                 type="text"

@@ -29,11 +29,11 @@ export default function DockLayout({ onOpenApp, openApps }: DockLayoutProps) {
   ];
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto">
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-9999 pointer-events-auto">
       <motion.div
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
-        className="flex h-[90px] items-end gap-3 rounded-2xl bg-white/10 border border-white/20 px-3 pb-2 backdrop-blur-2xl shadow-2xl"
+        className="flex h-22.5 items-end gap-3 rounded-2xl bg-white/10 border border-white/20 px-3 pb-2 backdrop-blur-2xl shadow-2xl"
       >
         {/* --- Left Side: Main Apps --- */}
         {dockApps.map((app) => (

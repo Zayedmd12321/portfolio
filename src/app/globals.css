@@ -5,6 +5,13 @@
   --wallpaper: url('/wallpapers/1.jpg');
 }
 
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   /* Set a dark background as fallback, but NOT 'bg-black' on the main container itself */
   background-color: #000;

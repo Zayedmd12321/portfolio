@@ -47,13 +47,13 @@ export default function Notification() {
           animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
           exit={{ opacity: 0, x: 20, scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="absolute top-12 right-5 w-[22rem] z-[99999] pointer-events-none select-none"
+          className="absolute top-12 right-5 w-88 z-99999 pointer-events-none select-none"
         >
           {/* Notification Card */}
           <div className="relative overflow-hidden rounded-2xl bg-[#2a2a2a]/60 backdrop-blur-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] p-4 flex gap-4">
             
             {/* Ambient Glow Background */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white/5 to-transparent pointer-events-none" />
 
             {/* Icon Container */}
             <div className="relative z-10 shrink-0">
@@ -66,7 +66,7 @@ export default function Notification() {
                    ] 
                  }}
                  transition={{ duration: 3, repeat: Infinity }}
-                 className={`w-12 h-12 rounded-xl bg-gradient-to-br ${typeStyles.gradient} flex items-center justify-center shadow-lg border border-white/10`}
+                 className={`w-12 h-12 rounded-xl bg-linear-to-br ${typeStyles.gradient} flex items-center justify-center shadow-lg border border-white/10`}
                >
                  <Icon className="text-white w-6 h-6 drop-shadow-md" />
                </motion.div>

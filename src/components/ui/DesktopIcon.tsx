@@ -17,7 +17,7 @@ export function DesktopIcon({ label, isPdf, onDoubleClick }: DesktopIconProps) {
           alt="icon"
         />
       </div>
-      <span className="text-white text-[12px] font-medium px-2 py-0.5 rounded-[4px] icon-text leading-tight text-center group-hover:bg-[#0061D3] line-clamp-2">
+      <span className="text-white text-[12px] font-medium px-2 py-0.5 rounded-sm icon-text leading-tight text-center group-hover:bg-[#0061D3] line-clamp-2">
         {label}
       </span>
     </div>

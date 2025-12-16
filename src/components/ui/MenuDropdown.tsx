@@ -17,11 +17,11 @@ export function MenuDropdown({ isOpen, items }: MenuDropdownProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -5 }}
           transition={{ duration: 0.1 }}
-          className="absolute top-8 left-0 min-w-[220px] bg-[#1e1e1eb3] backdrop-blur-2xl border border-white/10 shadow-2xl rounded-lg py-1.5 flex flex-col z-[10000]"
+          className="absolute top-8 left-0 min-w-55 bg-[#1e1e1eb3] backdrop-blur-2xl border border-white/10 shadow-2xl rounded-lg py-1.5 flex flex-col z-10000"
         >
           {items.map((item, idx) => (
             item.separator ? (
-              <div key={idx} className="h-[1px] bg-white/10 my-1 mx-2" />
+              <div key={idx} className="h-px bg-white/10 my-1 mx-2" />
             ) : (
               <button 
                 key={idx} 

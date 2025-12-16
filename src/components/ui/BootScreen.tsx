@@ -39,7 +39,7 @@ export default function BootScreen({ isLoading, onComplete }: BootScreenProps) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, filter: "blur(20px)", scale: 1.1 }}
           transition={{ duration: 1, ease: "easeInOut" }}
-          className="fixed inset-0 z-[99999] bg-black flex flex-col items-center justify-center cursor-none"
+          className="fixed inset-0 z-99999 bg-black flex flex-col items-center justify-center cursor-none"
         >
           {/* Apple Logo */}
           <motion.div 
