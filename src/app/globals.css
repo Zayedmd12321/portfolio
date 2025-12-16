@@ -1,17 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  /* 1. Use the Real Sonoma Wallpaper (High Res) - This changes EVERYTHING */
+  /* Fallback variable */
   --wallpaper: url('/wallpapers/1.jpg');
 }
 
 body {
-  background-image: var(--wallpaper);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* 2. Apple Typography Settings */
+  /* Set a dark background as fallback, but NOT 'bg-black' on the main container itself */
+  background-color: #000;
+  
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -20,12 +17,9 @@ body {
   user-select: none;
 }
 
-/* 3. The "Expensive" Glass Material */
-/* This is what makes the Dock and Sidebars look real. */
-/* It's not just blur; it's saturation + brightness boost. */
+/* Glass Panels */
 .glass-panel {
   background: rgba(29, 29, 31, 0.72);
-  /* Dark mode base */
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -42,22 +36,19 @@ body {
     0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* 4. Real Window Shadows (Deep & layered) */
 .window-shadow {
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.15),
-    /* Subtle rim light */
     0 20px 50px -12px rgba(0, 0, 0, 0.6);
-  /* Deep drop shadow */
 }
 
-/* 5. Desktop Icon Text Shadow */
 .icon-text {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   font-weight: 500;
   letter-spacing: 0.01em;
 }
 
+/* Scrollbars */
 .macos-scrollbar::-webkit-scrollbar {
   width: 9px;
   height: 9px;
@@ -79,7 +70,6 @@ body {
   background-color: rgba(120, 120, 120, 0.5);
 }
 
-/* Firefox support */
 .macos-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(120, 120, 120, 0.3) transparent;
