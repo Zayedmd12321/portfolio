@@ -17,6 +17,7 @@ import Notification from '@/components/ui/Notification';
 import MusicApp from '@/components/apps/MusicApp';
 import BootScreen from '@/components/ui/BootScreen';
 import { NotificationProvider, useNotification } from '@/context/NotificationContext';
+import ContactsApp from '@/components/apps/ContactsApp';
 
 function DesktopContent() {
   const { showNotification } = useNotification();
@@ -294,6 +295,16 @@ function DesktopContent() {
               zIndex={windows.music.z} minWidth={900} width={'40%'} minHeight={500} height={'30%'}
             >
               <MusicApp />
+            </WindowLayout>
+            <WindowLayout
+              id="contacts"
+              title="Contacts"
+              dockId="dock-icon-contacts"
+              isOpen={windows.contacts.isOpen} isMinimized={windows.contacts.isMinimized}
+              onClose={() => closeApp('contacts')} onMinimize={() => toggleApp('contacts')} onFocus={() => bringToFront('contacts')}
+              zIndex={windows.contacts.z} width={'70%'} height={'80%'}
+            >
+              <ContactsApp />
             </WindowLayout>
 
           </div>
