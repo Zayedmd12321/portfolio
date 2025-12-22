@@ -2,7 +2,7 @@
 
 :root {
   /* Fallback variable */
-  --wallpaper: url('/wallpapers/1.jpg');
+  --wallpaper: url('/wallpapers/3.jpg');
 }
 
 html, body {
@@ -81,3 +81,10 @@ body {
   scrollbar-width: thin;
   scrollbar-color: rgba(120, 120, 120, 0.3) transparent;
 }
+
+/* --- RESIZE HANDLES --- */
+.react-resizable-handle { cursor: default !important; }
+.react-resizable-handle-n, .react-resizable-handle-s { cursor: ns-resize !important; }
+.react-resizable-handle-e, .react-resizable-handle-w { cursor: ew-resize !important; }
+.react-resizable-handle-ne, .react-resizable-handle-sw { cursor: nesw-resize !important; }
+.react-resizable-handle-nw, .react-resizable-handle-se { cursor: nwse-resize !important; }

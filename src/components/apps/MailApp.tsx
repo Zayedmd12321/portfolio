@@ -40,7 +40,7 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
         <div className="px-4 mb-4">
            <button 
              onClick={() => setActiveSection('compose')}
-             className="w-full flex items-center justify-center gap-2 bg-[#007AFF] hover:bg-[#0062cc] transition-colors py-1.5 rounded-md shadow-sm active:scale-[0.98]"
+             className="w-full flex items-center justify-center gap-2 bg-[#007AFF] hover:bg-[#0062cc] transition-colors py-1.5 rounded-md shadow-sm active:scale-[0.98] cursor-pointer"
            >
              <PenSquare size={14} className="text-white" />
              <span className="text-[13px] font-medium text-white">New Message</span>
@@ -79,7 +79,7 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
                 <button 
                   onClick={handleSend}
                   disabled={sending}
-                  className="flex items-center gap-2 text-[#007AFF] hover:text-[#409cff] disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-2 text-[#007AFF] hover:text-[#409cff] disabled:opacity-50 transition-colors cursor-pointer"
                 >
                    <Send size={15} />
                    <span className="text-sm font-medium">{sending ? 'Sending...' : 'Send'}</span>
@@ -191,7 +191,7 @@ function SidebarItem({ icon: Icon, label, count, isActive, onClick }: any) {
   return (
     <button 
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all group ${
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all group cursor-pointer ${
          isActive ? 'bg-[#007AFF] text-white shadow-sm' : 'hover:bg-white/5 text-white/70 hover:text-white'
       }`}
     >

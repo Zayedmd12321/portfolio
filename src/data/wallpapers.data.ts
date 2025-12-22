@@ -5,4 +5,4 @@ export const wallpapers = [1, 2, 3, 4, 5, 6, 7].map(id => ({
   alt: `Wallpaper ${id}`
 }));
 
-export const defaultWallpaper = '/wallpapers/1.jpg';
+export const defaultWallpaper = '/wallpapers/3.jpg';

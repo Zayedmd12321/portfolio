@@ -169,11 +169,11 @@ export default function MusicApp() {
         {/* Controls Bar */}
         <div className="h-16 border-b border-white/10 flex items-center justify-between px-6 bg-[#262626]/80 backdrop-blur-md z-20">
            <div className="flex items-center gap-5 text-white/80">
-              <button onClick={handlePrev} className="hover:text-white transition active:scale-95"><SkipBack size={20} fill="currentColor" /></button>
-              <button onClick={() => setIsPlaying(!isPlaying)} className="hover:scale-105 transition active:scale-95 bg-white text-black rounded-full p-1">
+              <button onClick={handlePrev} className="hover:text-white transition active:scale-95 cursor-pointer"><SkipBack size={20} fill="currentColor" /></button>
+              <button onClick={() => setIsPlaying(!isPlaying)} className="hover:scale-105 transition active:scale-95 bg-white text-black rounded-full p-1 cursor-pointer">
                  {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
               </button>
-              <button onClick={handleNext} className="hover:text-white transition active:scale-95"><SkipForward size={20} fill="currentColor" /></button>
+              <button onClick={handleNext} className="hover:text-white transition active:scale-95 cursor-pointer"><SkipForward size={20} fill="currentColor" /></button>
            </div>
 
            {/* Now Playing Info (Centered) */}

@@ -82,7 +82,7 @@ export default function NotesApp() {
                <h4 className="font-bold text-sm text-red-400">Action Denied</h4>
                <p className="text-xs text-gray-300">The "About Me" profile cannot be deleted.</p>
              </div>
-             <button onClick={() => setShowAlert(false)} className="ml-auto text-gray-500 hover:text-white"><X size={14} /></button>
+             <button onClick={() => setShowAlert(false)} className="ml-auto text-gray-500 hover:text-white cursor-pointer"><X size={14} /></button>
           </div>
         </div>
       )}
@@ -108,7 +108,7 @@ export default function NotesApp() {
                       className="w-full bg-[#1c1c1c] rounded-md py-1 pl-8 pr-3 text-[13px] text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#dcae48]/50 placeholder:text-gray-500 border border-white/5 shadow-inner transition-all"
                     />
                   </div>
-                  <button onClick={createNote} className="p-1.5 text-gray-400 hover:text-[#dcae48] hover:bg-white/5 rounded-md transition-all" title="Create New Note">
+                  <button onClick={createNote} className="p-1.5 text-gray-400 hover:text-[#dcae48] hover:bg-white/5 rounded-md transition-all cursor-pointer" title="Create New Note">
                     <Plus size={18} />
                   </button>
                 </div>
@@ -131,7 +131,7 @@ export default function NotesApp() {
                       
                       <button 
                         onClick={(e) => deleteNoteById(e, note.id)}
-                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity ${activeNoteId === note.id ? 'text-black/60 hover:text-red-600 hover:bg-black/10' : 'text-gray-500 hover:text-red-400 hover:bg-[#1e1e1e]'}`}
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ${activeNoteId === note.id ? 'text-black/60 hover:text-red-600 hover:bg-black/10' : 'text-gray-500 hover:text-red-400 hover:bg-[#1e1e1e]'}`}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -157,7 +157,7 @@ export default function NotesApp() {
                 <PanelLeft size={20} strokeWidth={1.5} />
               </button>
 
-              <button onClick={deleteActiveNote} className={`p-2 rounded-md transition-colors ${activeNoteId === 'about' ? 'text-gray-700 cursor-not-allowed' : 'text-gray-500 hover:bg-white/5 hover:text-red-400'}`}>
+              <button onClick={deleteActiveNote} className={`p-2 rounded-md transition-colors ${activeNoteId === 'about' ? 'text-gray-700 cursor-not-allowed' : 'text-gray-500 hover:bg-white/5 hover:text-red-400 cursor-pointer'}`}>
                 <Trash2 size={18} strokeWidth={1.5} />
               </button>
            </div>
@@ -174,7 +174,7 @@ export default function NotesApp() {
                    {isEditing ? <Save size={18} /> : <Pencil size={18} />}
                  </button>
                )}
-               <button onClick={createNote} className="p-2 text-[#dcae48] hover:text-[#fdd875] hover:bg-[#dcae48]/10 rounded-md transition-colors"><SquarePen size={20} strokeWidth={1.5} /></button>
+               <button onClick={createNote} className="p-2 text-[#dcae48] hover:text-[#fdd875] hover:bg-[#dcae48]/10 rounded-md transition-colors cursor-pointer"><SquarePen size={20} strokeWidth={1.5} /></button>
            </div>
         </div>
 

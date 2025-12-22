@@ -57,7 +57,7 @@ export function DockIcon({
         style={{ width }}
         onClick={onClick}
         whileTap={{ scale: 0.9, translateY: 5 }}
-        className="aspect-square rounded-2xl flex items-center justify-center relative transition-colors"
+        className="aspect-square rounded-2xl flex items-center justify-center relative transition-colors cursor-pointer"
       >
         <img
           src={src}

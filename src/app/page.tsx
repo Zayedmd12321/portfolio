@@ -176,7 +176,7 @@ function DesktopContent() {
           <Notification />
 
           {/* Windows Area */}
-          <div className="absolute top-9 left-0 w-full h-[calc(100vh-30px)]">
+          <div className="absolute top-9 left-0 w-full h-[calc(100%-36px)]">
             
             <WindowLayout
               id="notes"

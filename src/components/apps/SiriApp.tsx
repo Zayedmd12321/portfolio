@@ -161,7 +161,7 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
                 <button
                   key={idx}
                   onClick={() => handleSend(suggestion.prompt)}
-                  className="group relative flex flex-col items-start gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300 overflow-hidden"
+                  className="group relative flex flex-col items-start gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all duration-300 overflow-hidden cursor-pointer"
                 >
                   <div className={`p-2 rounded-full bg-white/5 ${suggestion.color} group-hover:scale-110 transition-transform`}>
                     <suggestion.icon size={18} />
@@ -227,7 +227,7 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
             <button 
                 onClick={() => handleSend()}
                 disabled={!input.trim() || isLoading}
-                className="absolute right-2 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white disabled:opacity-0 disabled:scale-75 transition-all duration-200"
+                className="absolute right-2 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white disabled:opacity-0 disabled:scale-75 transition-all duration-200 cursor-pointer"
             >
                 {isLoading ? (
                     <Zap className="w-4 h-4 text-yellow-400 animate-pulse" />

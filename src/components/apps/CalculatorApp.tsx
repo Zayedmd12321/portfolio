@@ -41,7 +41,7 @@ const Button = ({ label, onClick, span = false, type = 'number', isActive = fals
         ${bgClass}
         h-14 sm:h-16 w-full
         active:brightness-110 transition-all duration-100 ease-in-out
-        text-[1.7rem] font-medium leading-none select-none
+        text-[1.7rem] font-medium leading-none select-none cursor-pointer
         ${textClass}
       `}
     >

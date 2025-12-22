@@ -25,7 +25,7 @@ export function MenuDropdown({ isOpen, items }: MenuDropdownProps) {
             ) : (
               <button 
                 key={idx} 
-                className="group w-full text-left px-4 py-1 text-[13px] text-white hover:bg-blue-500 hover:text-white transition-colors flex justify-between items-center rounded-md mx-1 max-w-[96%]"
+                className="group w-full text-left px-4 py-1 text-[13px] text-white hover:bg-blue-500 hover:text-white transition-colors flex justify-between items-center rounded-md mx-1 max-w-[96%] cursor-pointer"
               >
                 <span>{item.label}</span>
                 {item.shortcut && <span className="text-xs text-white/50 group-hover:text-white/90">{item.shortcut}</span>}

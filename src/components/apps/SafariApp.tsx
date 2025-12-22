@@ -268,7 +268,7 @@ export default function SafariApp() {
       `}>
          <div className="h-12 flex items-center justify-between px-4 border-b border-gray-300">
             <span className="font-semibold text-gray-600">Bookmarks</span>
-            <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-black">
+            <button onClick={() => setIsSidebarOpen(false)} className="text-gray-400 hover:text-black cursor-pointer">
               <Sidebar size={18} />
             </button>
          </div>
@@ -285,7 +285,7 @@ export default function SafariApp() {
                  <span className="text-sm text-gray-700 truncate flex-1">{b.name}</span>
                  <button 
                     onClick={(e) => { e.stopPropagation(); setBookmarks(prev => prev.filter(i => i.id !== b.id)) }}
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500"
+                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 cursor-pointer"
                   >
                     <Trash2 size={14} />
                  </button>
@@ -323,7 +323,7 @@ export default function SafariApp() {
                 </button>
               </div>
             ))}
-            <button onClick={() => createTab('')} className="p-1 ml-1 hover:bg-gray-300 rounded-md text-gray-500">
+            <button onClick={() => createTab('')} className="p-1 ml-1 hover:bg-gray-300 rounded-md text-gray-500 cursor-pointer">
               <Plus size={16} />
             </button>
           </div>
@@ -333,7 +333,7 @@ export default function SafariApp() {
             <div className="flex items-center gap-6 text-gray-500">
               <button 
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className={`transition-colors ${isSidebarOpen ? 'text-blue-500' : 'hover:text-black'}`} 
+                className={`transition-colors cursor-pointer ${isSidebarOpen ? 'text-blue-500' : 'hover:text-black'}`} 
                 title="Sidebar"
               >
                 <Sidebar size={18} strokeWidth={2} />
@@ -341,14 +341,14 @@ export default function SafariApp() {
               
               <div className="flex gap-4">
                 <button 
-                  className={`transition-colors ${activeTab.historyIndex > 0 ? 'hover:text-black text-gray-600' : 'text-gray-300 cursor-default'}`} 
+                  className={`transition-colors ${activeTab.historyIndex > 0 ? 'hover:text-black text-gray-600 cursor-pointer' : 'text-gray-300 cursor-default'}`} 
                   onClick={goBack}
                   disabled={activeTab.historyIndex <= 0}
                 >
                   <ChevronLeft size={20} strokeWidth={2} />
                 </button>
                 <button 
-                  className={`transition-colors ${activeTab.historyIndex < activeTab.history.length - 1 ? 'hover:text-black text-gray-600' : 'text-gray-300 cursor-default'}`} 
+                  className={`transition-colors ${activeTab.historyIndex < activeTab.history.length - 1 ? 'hover:text-black text-gray-600 cursor-pointer' : 'text-gray-300 cursor-default'}`} 
                   onClick={goForward}
                   disabled={activeTab.historyIndex >= activeTab.history.length - 1}
                 >
@@ -377,7 +377,7 @@ export default function SafariApp() {
                   spellCheck={false}
                 />
 
-                <button onClick={handleRefresh} className="ml-2 text-gray-500 hover:text-black transition-colors z-10">
+                <button onClick={handleRefresh} className="ml-2 text-gray-500 hover:text-black transition-colors z-10 cursor-pointer">
                   <RotateCw size={12} className={activeTab.isLoading ? "animate-spin" : ""} />
                 </button>
 
@@ -399,7 +399,7 @@ export default function SafariApp() {
                  <Star size={18} className={isCurrentTabBookmarked ? "fill-yellow-500" : ""} />
                </button>
 
-               <button onClick={goHome} className="hover:text-black transition-colors" title="Home">
+               <button onClick={goHome} className="hover:text-black transition-colors cursor-pointer" title="Home">
                  <Home size={18} />
                </button>
             </div>

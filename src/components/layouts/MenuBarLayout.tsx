@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { Wifi, Battery, BatteryCharging, Search, Moon, Sun } from 'lucide-react';
+import { Wifi, Battery, BatteryCharging, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOS } from '@/context/OSContext';
 import { MenuButton } from '@/components/ui/MenuButton';
@@ -41,7 +41,7 @@ export default function MenuBarLayout() {
   const battery = useBattery();
   const menuRef = useRef<HTMLDivElement>(null);
   const controlCenterRef = useRef<HTMLDivElement>(null);
-  const { theme, toggleTheme, changeWallpaper } = useOS();
+  const { changeWallpaper } = useOS();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -127,7 +127,7 @@ export default function MenuBarLayout() {
             <div className="relative" ref={controlCenterRef}>
                 <div 
                     onClick={() => setActiveMenu(activeMenu === 'control-center' ? null : 'control-center')}
-                    className={`ml-1 cursor-default p-1 rounded transition-colors ${activeMenu === 'control-center' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white'}`}
+                    className={`ml-1 cursor-pointer p-1 rounded transition-colors ${activeMenu === 'control-center' ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white'}`}
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M4 6h16M4 12h16M4 18h16" />
@@ -146,25 +146,6 @@ export default function MenuBarLayout() {
                             transition={{ duration: 0.15, ease: "easeOut" }}
                             className="absolute top-10 -right-20 sm:right-0 w-75 bg-[#1e1e1eb3] backdrop-blur-3xl border border-white/10 shadow-2xl rounded-2xl p-4 flex flex-col gap-4 z-10000"
                         >
-                            {/* Theme Toggle */}
-                            <div className="flex flex-col gap-2">
-                                <span className="text-xs font-semibold text-gray-400 ml-1">Display & Theme</span>
-                                <button 
-                                    onClick={toggleTheme}
-                                    className="flex items-center justify-between bg-white/10 hover:bg-white/20 transition-colors p-3 rounded-xl border border-white/5 group"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                            {theme === 'dark' ? <Moon size={16} fill="currentColor" /> : <Sun size={16} fill="currentColor" />}
-                                        </div>
-                                        <div className="flex flex-col items-start">
-                                            <span className="text-sm font-medium text-white">Dark Mode</span>
-                                            <span className="text-[10px] text-gray-400">{theme === 'dark' ? 'On' : 'Off'}</span>
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
-
                             {/* Wallpaper Picker */}
                             <div className="flex flex-col gap-2">
                                 <span className="text-xs font-semibold text-gray-400 ml-1">Wallpapers</span>
@@ -173,7 +154,7 @@ export default function MenuBarLayout() {
                                         <button
                                             key={wp.id}
                                             onClick={() => changeWallpaper(wp.path)}
-                                            className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-blue-500 hover:scale-110 transition-all shadow-sm"
+                                            className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-blue-500 hover:scale-110 transition-all shadow-sm cursor-pointer"
                                         >
                                             <img 
                                                 src={wp.path} 

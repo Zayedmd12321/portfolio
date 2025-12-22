@@ -28,7 +28,7 @@ export default function VSCodeApp() {
             <span className="rotate-90 text-[10px]">▶</span>
             <span className="font-bold">ZAYED-PORTFOLIO</span>
           </div>
-          <div className="pl-4 py-1 text-[#569cd6]">src</div>
+          <div className="pl-4 py-1 text-[#569cd6] cursor-pointer">src</div>
           <div className="pl-6 py-1 flex items-center gap-2 bg-[#094771] text-white cursor-pointer">
              <span className="text-[#61dafb] text-xs">TS</span>
              profile.ts

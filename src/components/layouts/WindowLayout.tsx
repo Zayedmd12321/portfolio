@@ -134,7 +134,7 @@ export default function WindowLayout({
           size={isMaximized ? { width: '100vw', height: '100vh' } : undefined}
           position={isMaximized ? { x: 0, y: 0 } : position}
         >
-          <div className="w-full h-full" style={{ position: 'relative', zIndex: isMaximized ? 100000 : 'auto' }}>
+          <div className="w-full h-full cursor-auto" style={{ position: 'relative', zIndex: isMaximized ? 100000 : 'auto' }}>
             <motion.div
               variants={variants}
               initial="initial"
@@ -145,19 +145,19 @@ export default function WindowLayout({
             >
               {/* Header */}
               <div
-                className={`window-header shrink-0 flex items-center px-4 cursor-default select-none relative transition-colors duration-300 ${sidebar ? 'h-13 bg-transparent' : 'h-10 bg-[#2b2b2b] border-b border-black/40'}`}
+                className={`window-header shrink-0 flex items-center px-4 cursor-move select-none relative transition-colors duration-300 ${sidebar ? 'h-13 bg-transparent' : 'h-10 bg-[#2b2b2b] border-b border-black/40'}`}
                 onMouseEnter={() => setIsHoveringLights(true)}
                 onMouseLeave={() => setIsHoveringLights(false)}
                 onDoubleClick={() => setIsMaximized(!isMaximized)}
               >
                 <div className="flex gap-2 z-20 items-center">
-                  <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="w-3 h-3 rounded-full bg-[#FF5F57] flex items-center justify-center border border-black/10 active:brightness-75 shadow-sm">
+                  <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="w-3 h-3 rounded-full bg-[#FF5F57] flex items-center justify-center border border-black/10 active:brightness-75 shadow-sm cursor-pointer">
                     <X size={7} className={`text-black/60 ${isHoveringLights ? 'opacity-100' : 'opacity-0'} transition-opacity`} />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); onMinimize(); }} className="w-3 h-3 rounded-full bg-[#FEBC2E] flex items-center justify-center border border-black/10 active:brightness-75 shadow-sm">
+                  <button onClick={(e) => { e.stopPropagation(); onMinimize(); }} className="w-3 h-3 rounded-full bg-[#FEBC2E] flex items-center justify-center border border-black/10 active:brightness-75 shadow-sm cursor-pointer">
                     <Minus size={7} className={`text-black/60 ${isHoveringLights ? 'opacity-100' : 'opacity-0'} transition-opacity`} />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); setIsMaximized(!isMaximized); }} className="w-3 h-3 rounded-full bg-[#28C840] flex items-center justify-center border border-black/10 active:brightness-75 shadow-sm">
+                  <button onClick={(e) => { e.stopPropagation(); setIsMaximized(!isMaximized); }} className="w-3 h-3 rounded-full bg-[#28C840] flex items-center justify-center border border-black/10 active:brightness-75 shadow-sm cursor-pointer">
                     <ChevronsLeftRight size={6} className={`text-black/60 rotate-45 ${isHoveringLights ? 'opacity-100' : 'opacity-0'} transition-opacity`} />
                   </button>
                 </div>
