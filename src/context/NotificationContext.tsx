@@ -7,12 +7,13 @@ interface NotificationData {
   title: string;
   message: string;
   type: NotificationType;
+  onClick?: () => void; // ✅ Added click handler support
 }
 
 interface NotificationContextType {
   isVisible: boolean;
   notification: NotificationData | null;
-  showNotification: (title: string, message: string, type: NotificationType) => void;
+  showNotification: (title: string, message: string, type: NotificationType, onClick?: () => void) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -22,17 +23,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notification, setNotification] = useState<NotificationData | null>(null);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
-  const showNotification = useCallback((title: string, message: string, type: NotificationType) => {
-    // Clear any existing timeout to prevent race conditions
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
+  const showNotification = useCallback((title: string, message: string, type: NotificationType, onClick?: () => void) => {
+    if (timeoutId) clearTimeout(timeoutId);
 
-    // Set new notification
-    setNotification({ title, message, type });
+    setNotification({ title, message, type, onClick });
     setIsVisible(true);
 
-    // Auto-hide after 5 seconds
     const newTimeoutId = setTimeout(() => {
       setIsVisible(false);
     }, 5000);
