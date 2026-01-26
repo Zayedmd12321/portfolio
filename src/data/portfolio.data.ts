@@ -70,9 +70,9 @@ export interface Experience {
 export const experiences: Experience[] = [
   {
     title: "Front End Intern",
-    company: "Company XYZ",
+    company: "Tilak Karvekar",
     status: "Present",
-    description: "Creating Responsive websites constituting charts of various metrics of company. Handling huge data and optimizing the website for better performance and user experience.",
+    description: "Creating Responsive websites constituting charts of various fundamental metrics of company. Handling huge data and optimizing the website for better performance and user experience.",
     technologies: ["React", "Tailwind"]
   },
   {
@@ -80,16 +80,50 @@ export const experiences: Experience[] = [
     company: "NSSC IIT Kharagpur",
     status: "2024-2025",
     description: "Contributed to the development of the official NSSC website using Next.js and Modern UI. Improved user engagement by implementing responsive design principles.",
-    technologies: ["Next.js", "Modern UI"]
+    technologies: ["Next.js", "MongoDB", "Express"]
   }
 ];
 
 export interface Projects {
+  id: number;
   name: string;
   description: string;
-  technologies: string[];
+  techStack: string[];
+  link: string | null;
+  role: string;
 }
 
 export const projects: Projects[] = [
-  // Projects can be added here in the future
+  {
+    id: 1,
+    name: "Vylos",
+    description: "A web application to deploy your react, node or static projects for free with custom domains and serverless. Uses FastAPI backend with AWS deployment and nginx server.",
+    techStack: ["AWS", "Nginx", "FastAPI", "Docker", "PostgreSQL"],
+    link: null,
+    role: "Full Stack Developer",
+  },
+  {
+    id: 2,
+    name: "Inter IIT Tech Meet 14.0 - Pathway",
+    description: "Development team member for the Pathway problem statement focused on Agentic AI. Helped with Frontend, Backend and DevOps",
+    techStack: ["Next.js", "Docker", "AWS", "FastAPI", "PostgreSQL"],
+    link: null,
+    role: "Dev Team Member"
+  },
+  {
+    id: 3,
+    name: "NSSC Official Website",
+    description: "Frontend development for the National Students' Space Challenge official website.",
+    techStack: ["Next.js", "React"],
+    link: "https://nssc.in",
+    role: "Frontend Developer"
+  },
+  {
+    id: 4,
+    name: "NSSC Student Ambassador Portal",
+    description: "Web platform for the Student Ambassador program of NSSC.",
+    techStack: ["Next.js", "React"],
+    link: "https://sa.nssc.in",
+    role: "Frontend Developer"
+  },
 ];

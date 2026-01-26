@@ -16,5 +16,13 @@ export const initialNotes: Note[] = [
     preview: 'Md Zayed Ghanchi - Portfolio',
     isPortfolio: true,
     body: ''
+  },
+  {
+    id: 'projects',
+    title: 'Projects',
+    date: '12/13/2025',
+    preview: 'My Notable Projects & Work',
+    isPortfolio: true,
+    body: ''
   }
 ];

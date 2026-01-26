@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Trash2, SquarePen, AlertCircle, X, Briefcase, Mail, Github, Linkedin, 
-  Plus, Pencil, Save, PanelLeft, MapPin
+  Plus, Pencil, Save, PanelLeft, MapPin, ExternalLink, FolderGit2, Image as ImageIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Note, initialNotes } from '@/data/notes.data';
-import { profileData, skills, experiences } from '@/data/portfolio.data';
+import { profileData, skills, experiences, projects } from '@/data/portfolio.data';
 
-export default function NotesApp() {
+export default function NotesApp({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [activeNoteId, setActiveNoteId] = useState<string | null>('about');
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +32,7 @@ export default function NotesApp() {
 
   const deleteNoteById = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (id === 'about') {
+    if (id === 'about' || id === 'projects') {
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
       return;
@@ -80,7 +80,7 @@ export default function NotesApp() {
              <div className="bg-red-500/20 p-2 rounded-full text-red-400"><AlertCircle size={20} /></div>
              <div>
                <h4 className="font-bold text-sm text-red-400">Action Denied</h4>
-               <p className="text-xs text-gray-300">The "About Me" profile cannot be deleted.</p>
+               <p className="text-xs text-gray-300">Portfolio notes cannot be deleted.</p>
              </div>
              <button onClick={() => setShowAlert(false)} className="ml-auto text-gray-500 hover:text-white cursor-pointer"><X size={14} /></button>
           </div>
@@ -157,7 +157,7 @@ export default function NotesApp() {
                 <PanelLeft size={20} strokeWidth={1.5} />
               </button>
 
-              <button onClick={deleteActiveNote} className={`p-2 rounded-md transition-colors ${activeNoteId === 'about' ? 'text-gray-700 cursor-not-allowed' : 'text-gray-500 hover:bg-white/5 hover:text-red-400 cursor-pointer'}`}>
+              <button onClick={deleteActiveNote} className={`p-2 rounded-md transition-colors ${activeNoteId === 'about' || activeNoteId === 'projects' ? 'text-gray-700 cursor-not-allowed' : 'text-gray-500 hover:bg-white/5 hover:text-red-400 cursor-pointer'}`}>
                 <Trash2 size={18} strokeWidth={1.5} />
               </button>
            </div>
@@ -183,7 +183,7 @@ export default function NotesApp() {
            {!activeNote ? (
                <div className="flex h-full items-center justify-center text-gray-600">No Note Selected</div>
            ) : activeNote.isPortfolio ? (
-             <PortfolioSplitView />
+             activeNote.id === 'about' ? <PortfolioSplitView /> : <ProjectsSplitView onOpenApp={onOpenApp} />
            ) : (
              <div className="max-w-4xl mx-auto px-8 py-8 h-full flex flex-col">
                {isEditing ? (
@@ -378,14 +378,36 @@ function ExperienceSection() {
 
               {/* Tech Stack Pills */}
               <div className="flex gap-2 flex-wrap">
-                {exp.technologies.map((tech, techIdx) => (
-                  <span 
-                    key={techIdx} 
-                    className="text-[10px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-sm border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                  >
-                    {tech}
-                  </span>
-                ))}
+                {exp.technologies.map((tech, techIdx) => {
+                  // Map technology names to their icon paths
+                  const techIconMap: Record<string, string> = {
+                    'React': '/skills/react_dark.svg',
+                    'Next.js': '/skills/nextjs_icon_dark.svg',
+                    'Tailwind': '/skills/tailwindcss.svg',
+                    'TypeScript': '/skills/typescript.svg',
+                    'Node.js': '/skills/nodejs.svg',
+                    'MongoDB': '/skills/mongodb-icon-dark.svg',
+                    'FastAPI': '/skills/fastapi.svg',
+                    'AWS': '/skills/aws_dark.svg',
+                    'Docker': '/skills/docker.svg',
+                    'PostgreSQL': '/skills/postgresql.svg',
+                    'Express': '/skills/expressjs_dark.svg',
+                    
+                  };
+                  const techIcon = techIconMap[tech];
+                  
+                  return (
+                    <span 
+                      key={techIdx} 
+                      className="flex items-center gap-1.5 text-[10px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-sm border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    >
+                      {techIcon && (
+                        <img src={techIcon} alt={tech} className="w-3 h-3 object-contain" />
+                      )}
+                      {tech}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -433,5 +455,130 @@ function SocialBtn({ icon, href }: { icon: any, href: string }) {
     <a href={href} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#252525] rounded-lg text-gray-400 hover:text-white hover:bg-[#dcae48] transition-all duration-300 shadow-sm border border-white/5 hover:border-transparent">
       {icon}
     </a>
+  );
+}
+
+// --- PROJECTS VIEW ---
+
+function ProjectsSplitView({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
+  return (
+    <div className="w-full h-full overflow-y-auto macos-scrollbar bg-[#1c1c1c]">
+      <div className="max-w-6xl mx-auto px-8 pb-12">
+        <ProjectsSection onOpenApp={onOpenApp} />
+      </div>
+    </div>
+  );
+}
+
+function ProjectsSection({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-10 border-b border-white/5 pt-10 pb-4 sticky top-0 bg-[#1c1c1c] z-30">
+        <FolderGit2 className="text-[#dcae48]" size={24} />
+        <h2 className="text-2xl font-bold text-white tracking-tight">Projects</h2>
+      </div>
+
+      {/* Projects Grid */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,400px),1fr))] gap-6">
+        {projects.map((project) => (
+          <ProjectCard key={project.id} project={project} onOpenApp={onOpenApp} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProjectCard({ project, onOpenApp }: { project: any; onOpenApp?: (id: string) => void }) {
+  const getTechIcon = (tech: string) => {
+    const techMap: { [key: string]: string } = {
+      'AWS': 'aws_dark.svg',
+      'Nginx': 'nginx.svg',
+      'FastAPI': 'fastapi.svg',
+      'Ubuntu': 'ubuntu.svg',
+      'Next.js': 'nextjs_icon_dark.svg',
+      'React': 'react_dark.svg',
+      'Frontend': 'react_dark.svg',
+      'Web Development': 'nextjs_icon_dark.svg',
+      'Docker': 'docker.svg',
+      'TypeScript': 'typescript.svg',
+      'Node.js': 'nodejs.svg',
+      'MongoDB': 'mongodb-icon-dark.svg',
+      'PostgreSQL': 'postgresql.svg',
+      'Tailwind': 'tailwindcss.svg',
+      'Git': 'git.svg',
+      'Firebase': 'firebase.svg',
+      'Supabase': 'supabase.svg'
+    };
+    return techMap[tech] || null;
+  };
+
+  return (
+    <div className="group relative rounded-xl border border-white/5 bg-[#252525]/50 p-6 transition-all duration-300 hover:bg-[#252525] hover:border-[#dcae48]/30 hover:shadow-lg hover:-translate-y-1">
+      
+      {/* Project Header */}
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-white leading-tight group-hover:text-[#dcae48] transition-colors mb-2">
+            {project.name}
+          </h3>
+          <span className="inline-block text-xs text-gray-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
+            {project.role}
+          </span>
+        </div>
+        
+        {project.link && (
+          <a 
+            href={project.link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="p-2 text-gray-500 hover:text-[#dcae48] hover:bg-white/5 rounded-lg transition-all cursor-pointer"
+            title="Visit Project"
+          >
+            <ExternalLink size={18} />
+          </a>
+        )}
+      </div>
+
+      {/* Description */}
+      <p className="text-sm text-gray-300 leading-relaxed mb-5 border-l-2 border-white/5 pl-4 group-hover:border-[#dcae48]/50 transition-colors">
+        {project.description}
+      </p>
+
+      {/* Tech Stack Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Tech Stack</span>
+          {onOpenApp && (
+            <button
+              onClick={() => onOpenApp('photos')}
+              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#dcae48] transition-colors cursor-pointer"
+            >
+              <ImageIcon size={14} />
+              See Photos
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {project.techStack.map((tech: string, idx: number) => {
+            const icon = getTechIcon(tech);
+            return (
+              <div key={idx} className="flex items-center gap-2 bg-[#1e1e1e] border border-white/5 px-3 py-2 rounded-lg hover:border-white/10 transition-colors">
+                {icon && (
+                  <img 
+                    src={`/skills/${icon}`} 
+                    alt={tech} 
+                    className="w-5 h-5 object-contain"
+                    onError={(e) => e.currentTarget.style.display='none'}
+                  />
+                )}
+                <span className="text-xs text-gray-300 font-medium">{tech}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
