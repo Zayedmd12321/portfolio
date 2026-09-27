@@ -148,7 +148,7 @@ export default function MusicApp() {
     <div className="flex h-full bg-[#1e1e1e] text-white/90 font-sans select-none overflow-hidden">
 
       {/* --- Sidebar --- */}
-      <div className="w-56 bg-[#262626]/50 border-r border-white/10 flex flex-col pt-8 pb-4 backdrop-blur-xl shrink-0 hidden md:flex">
+      <div className="w-56 bg-[#262626]/50 border-r border-white/10 flex flex-col pt-8 pb-4 backdrop-blur-xl shrink-0 hidden @md:flex">
         <form onSubmit={handleSearch} className="px-4 mb-6">
           <div className="relative group">
             <Search className="absolute left-2.5 top-1.5 text-white/30 w-4 h-4 group-focus-within:text-red-400 transition-colors" />
@@ -220,7 +220,7 @@ export default function MusicApp() {
         </div>
 
         {/* Scrollable Grid */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 macos-scrollbar bg-gradient-to-b from-[#262626] to-[#1e1e1e]">
+        <div className="flex-1 overflow-y-auto p-6 @md:p-8 macos-scrollbar bg-gradient-to-b from-[#262626] to-[#1e1e1e]">
           {isSearching ? (
              <div className="flex h-full items-center justify-center">
                 <Loader2 className="w-10 h-10 text-red-500 animate-spin" />
@@ -231,7 +231,7 @@ export default function MusicApp() {
                 {searchQuery ? `Results for "${searchQuery}"` : 'Top Picks'}
               </h1>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 pb-12">
+              <div className="grid grid-cols-2 @sm:grid-cols-3 @md:grid-cols-4 @lg:grid-cols-5 gap-6 pb-12">
                 {playlist.map((song) => (
                   <div
                     key={song.id}

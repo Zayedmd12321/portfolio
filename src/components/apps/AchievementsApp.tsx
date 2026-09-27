@@ -58,7 +58,7 @@ export default function AchievementsApp() {
 
           {/* Grid */}
           <div className="flex-1 overflow-y-auto p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">
               {filteredAchievements.map((achievement) => {
                 const isUnlocked = unlockedIds.includes(achievement.id);
                 const Icon = achievement.icon;

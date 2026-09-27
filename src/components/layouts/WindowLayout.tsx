@@ -1,8 +1,14 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 import { X, Minus, ChevronsLeftRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  computeInitialRect,
+  clampRect,
+  MENUBAR_HEIGHT,
+} from '@/hooks/useDesktopSize';
+import { useSharedDesktopSize } from '@/context/DesktopSizeContext';
 
 interface WindowLayoutProps {
   id: string;
@@ -26,12 +32,49 @@ interface WindowLayoutProps {
 
 export default function WindowLayout({
   title, isOpen, isMinimized, onClose, onMinimize, onFocus, zIndex, children,
-  width = 800, height = 600, x = 100, y = 50, sidebar = false, dockId, minWidth = 350, minHeight = 250
+  width = 800, height = 600, sidebar = false, dockId, minWidth = 320, minHeight = 240
 }: WindowLayoutProps) {
   const [isHoveringLights, setIsHoveringLights] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-  const [position, setPosition] = useState({ x, y });
-  const [size, setSize] = useState({ width, height });
+  const desktop = useSharedDesktopSize();
+
+  // Effective floors: never demand more than the available desktop can supply.
+  const effMinWidth = Math.min(minWidth, Math.max(280, desktop.availableWidth - 16));
+  const effMinHeight = Math.min(minHeight, Math.max(200, desktop.availableHeight - 16));
+
+  // Lazy-initialise rect from the current desktop area rather than fixed pixels.
+  const [rect, setRect] = useState(() =>
+    computeInitialRect(desktop, {
+      width,
+      height,
+      minWidth: effMinWidth,
+      minHeight: effMinHeight,
+    }),
+  );
+
+  // Track whether the user has manually moved/resized this window. Until then,
+  // we keep the window centered as the viewport changes so first-time openers
+  // never see a window pinned in the wrong corner.
+  const userMovedRef = useRef(false);
+
+  // Recompute or clamp the rect whenever the available desktop changes.
+  useEffect(() => {
+    setRect((prev) => {
+      if (!userMovedRef.current) {
+        // Re-center with the *current* desired size until the user takes over.
+        return computeInitialRect(desktop, {
+          width,
+          height,
+          minWidth: effMinWidth,
+          minHeight: effMinHeight,
+        });
+      }
+      return clampRect(desktop, prev, {
+        minWidth: effMinWidth,
+        minHeight: effMinHeight,
+      });
+    });
+  }, [desktop, width, height, effMinWidth, effMinHeight]);
 
   // Reset maximized state when window is minimized or closed.
   // React docs pattern for "adjusting state when a prop changes":
@@ -57,18 +100,15 @@ export default function WindowLayout({
     let targetY = window.innerHeight - 50;
 
     if (dockElement) {
-      const rect = dockElement.getBoundingClientRect();
-      targetX = rect.left + rect.width / 2;
-      targetY = rect.top + rect.height / 2;
+      const r = dockElement.getBoundingClientRect();
+      targetX = r.left + r.width / 2;
+      targetY = r.top + r.height / 2;
     }
 
-    const numWidth = typeof size.width === 'string' ? parseInt(size.width) : size.width;
-    const numHeight = typeof size.height === 'string' ? parseInt(size.height) : size.height;
-
-    const windowCenterX = position.x + (numWidth / 2);
-    const windowBottomY = position.y + numHeight;
+    const windowCenterX = rect.x + rect.width / 2;
+    const windowBottomY = rect.y + rect.height;
     return { x: targetX - windowCenterX, y: targetY - windowBottomY };
-  }, [position, size, isOpen, isMinimized, dockId]);
+  }, [rect, isOpen, isMinimized, dockId]);
 
   const variants = {
     initial: {
@@ -118,26 +158,43 @@ export default function WindowLayout({
   };
   const currentZIndex = isMaximized ? 100000 : zIndex;
 
+  // Maximized windows fill the *desktop* area (viewport minus the MenuBar);
+  // the parent container is already offset by MENUBAR_HEIGHT, so 100% inside
+  // it lines up with the visible desktop.
+  const maximizedSize = {
+    width: `${desktop.vw}px`,
+    height: `${Math.max(240, desktop.vh - MENUBAR_HEIGHT)}px`,
+  };
+
   return (
     <AnimatePresence>
       {(isOpen || isMinimized) && (
         <Rnd
-          default={{ x: 100, y: 50, width, height }}
-          minWidth={minWidth}
-          minHeight={minHeight}
-          bounds={isMaximized ? undefined : "parent"}
+          size={isMaximized ? maximizedSize : { width: rect.width, height: rect.height }}
+          position={isMaximized ? { x: 0, y: 0 } : { x: rect.x, y: rect.y }}
+          minWidth={effMinWidth}
+          minHeight={effMinHeight}
+          maxWidth={desktop.availableWidth}
+          maxHeight={desktop.availableHeight}
+          bounds={isMaximized ? undefined : 'parent'}
           dragHandleClassName="window-header"
           onMouseDown={onFocus}
-          style={{ zIndex: currentZIndex, position: isMaximized ? 'fixed' : 'absolute' }}
+          style={{ zIndex: currentZIndex, position: 'absolute' }}
           enableResizing={!isMaximized}
           disableDragging={isMaximized}
-          onDragStop={(e, d) => setPosition({ x: d.x, y: d.y })}
-          onResizeStop={(e, direction, ref, delta, position) => {
-            setSize({ width: parseInt(ref.style.width), height: parseInt(ref.style.height) });
-            setPosition(position);
+          onDragStop={(_e, d) => {
+            userMovedRef.current = true;
+            setRect((prev) => ({ ...prev, x: d.x, y: d.y }));
           }}
-          size={isMaximized ? { width: '100vw', height: '100vh' } : undefined}
-          position={isMaximized ? { x: 0, y: 0 } : position}
+          onResizeStop={(_e, _direction, ref, _delta, position) => {
+            userMovedRef.current = true;
+            setRect({
+              width: parseInt(ref.style.width),
+              height: parseInt(ref.style.height),
+              x: position.x,
+              y: position.y,
+            });
+          }}
         >
           <div className="w-full h-full cursor-auto" style={{ position: 'relative', zIndex: isMaximized ? 100000 : 'auto' }}>
             <motion.div
@@ -171,8 +228,12 @@ export default function WindowLayout({
                 </div>
               </div>
 
-              {/* Content */}
-              <div className={`flex-1 overflow-hidden relative ${sidebar ? 'flex bg-black/20 backdrop-blur-xl' : 'bg-[#1e1e1e]'}`}>
+              {/* Content — establishes a container-query context so apps can
+                  respond to their own window width instead of the viewport. */}
+              <div
+                className={`flex-1 overflow-hidden relative @container ${sidebar ? 'flex bg-black/20 backdrop-blur-xl' : 'bg-[#1e1e1e]'}`}
+                style={{ containerType: 'inline-size' }}
+              >
                 {children}
               </div>
             </motion.div>

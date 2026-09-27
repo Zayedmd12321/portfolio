@@ -97,12 +97,12 @@ export default function NotesApp({ onOpenApp }: { onOpenApp?: (id: string) => vo
             transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
             className="bg-[#2d2d2d]/95 backdrop-blur-xl border-r border-black/50 shrink-0 h-full flex flex-col overflow-hidden whitespace-nowrap"
           >
-            <div className="w-65">
+            <div className="w-65 h-full flex flex-col min-h-0">
                 {/* Sidebar Header */}
                 <div className="h-14 flex items-center gap-2 px-4 shrink-0 pt-2 pb-2">
                   <div className="relative w-full group">
                     <Search size={14} className="absolute left-2.5 top-1.5 text-gray-500 group-focus-within:text-white/70 transition-colors" />
-                    <input 
+                    <input
                       type="text" placeholder="Search" value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full bg-[#1c1c1c] rounded-md py-1 pl-8 pr-3 text-[13px] text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#dcae48]/50 placeholder:text-gray-500 border border-white/5 shadow-inner transition-all"
@@ -113,7 +113,7 @@ export default function NotesApp({ onOpenApp }: { onOpenApp?: (id: string) => vo
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-2 space-y-0.5 macos-scrollbar min-h-0 h-[calc(100vh-60px)]">
+                <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-0.5 macos-scrollbar">
                   <div className="text-[10px] font-bold text-gray-500/60 px-3 mb-1 mt-2 tracking-wider">ICLOUD</div>
                   {filteredNotes.map((note) => (
                     <div 
@@ -425,9 +425,9 @@ function ExperienceSection() {
 }
 
 function TechSection({ columns }: { columns?: number }) {
-  const gridClass = columns 
-    ? `grid-cols-1 ${columns === 2 ? 'lg:grid-cols-2' : ''}` 
-    : 'grid-cols-1 lg:grid-cols-2';
+  const gridClass = columns
+    ? `grid-cols-1 ${columns === 2 ? '@lg:grid-cols-2' : ''}`
+    : 'grid-cols-1 @lg:grid-cols-2';
 
   return (
     <div className="animate-in slide-in-from-right-4 duration-700 delay-200">

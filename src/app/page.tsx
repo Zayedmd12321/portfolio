@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import MenuBarLayout from '@/components/layouts/MenuBarLayout';
 import DockLayout from '@/components/layouts/DockLayout';
@@ -22,11 +22,14 @@ import PhotosApp from '@/components/apps/PhotosApp';
 import { DesktopIcon } from '@/components/ui/DesktopIcon';
 import { NotificationProvider, useNotification } from '@/context/NotificationContext';
 import { AchievementsProvider, useAchievements } from '@/context/AchievementsContext';
+import { DesktopSizeProvider } from '@/context/DesktopSizeContext';
+import { useDesktopSize } from '@/hooks/useDesktopSize';
 
 function DesktopContent() {
   const { showNotification } = useNotification();
   const { setOpenAchievementsApp, unlockAchievement } = useAchievements();
-  
+  const windowContainerRef = useRef<HTMLDivElement>(null);
+
   // --- Boot & Mount State ---
   const [isMounted, setIsMounted] = useState(false);
   const [showBootScreen, setShowBootScreen] = useState(true);
@@ -49,27 +52,44 @@ function DesktopContent() {
     achievements: { isOpen: false, isMinimized: false, z: 14 },
   });
 
-  const [centerPosition, setCenterPosition] = useState({ x: 100, y: 50 });
+  const desktop = useDesktopSize(windowContainerRef);
 
   useEffect(() => {
-    const calculateCenter = () => {
-      if (typeof window !== 'undefined') {
-        const notesWidth = Math.min(window.innerWidth * 0.6, 1000); 
-        const notesHeight = 700;
-        const x = (window.innerWidth - notesWidth) / 2;
-        const y = (window.innerHeight - 36 - notesHeight) / 2;
-        setCenterPosition({ x: Math.max(10, x), y: Math.max(40, y) });
-      }
-    };
-
-    calculateCenter();
-    const initTimer = setTimeout(() => setIsMounted(true), 1500); 
-    window.addEventListener('resize', calculateCenter);
-    return () => {
-        window.removeEventListener('resize', calculateCenter);
-        clearTimeout(initTimer);
-    };
+    const initTimer = setTimeout(() => setIsMounted(true), 1500);
+    return () => clearTimeout(initTimer);
   }, []);
+
+  // Per-window size preferences tuned to the current desktop.
+  //
+  // Caps below intentionally match (or come in slightly under) the original
+  // fixed dimensions the site was designed against, so that on a typical
+  // desktop viewport windows keep their familiar footprint. Percentages
+  // scale them DOWN on smaller viewports; caps prevent them from bloating
+  // on very large viewports. Floors keep them usable.
+  const winSize = useMemo(() => {
+    const aw = desktop.availableWidth;
+    const ah = desktop.availableHeight;
+    const wPct = (pct: number, min: number, max: number) =>
+      Math.round(Math.min(max, Math.max(min, aw * pct)));
+    const hPct = (pct: number, min: number, max: number) =>
+      Math.round(Math.min(max, Math.max(min, ah * pct)));
+
+    return {
+      notes:        { width: wPct(0.55, 560, 1000), height: hPct(0.70, 440, 700) },
+      siri:         { width: wPct(0.28, 360, 500),  height: hPct(0.60, 440, 600) },
+      mail:         { width: wPct(0.50, 560, 900),  height: hPct(0.58, 440, 600) },
+      resume:       { width: wPct(0.44, 560, 800),  height: hPct(0.58, 440, 600) },
+      vscode:       { width: wPct(0.50, 560, 900),  height: hPct(0.58, 440, 600) },
+      finder:       { width: wPct(0.44, 520, 800),  height: hPct(0.48, 400, 500) },
+      terminal:     { width: wPct(0.34, 440, 600),  height: hPct(0.58, 440, 600) },
+      safari:       { width: wPct(0.48, 560, 850),  height: hPct(0.54, 420, 550) },
+      calculator:   { width: wPct(0.18, 260, 300),  height: hPct(0.54, 440, 550) },
+      music:        { width: wPct(0.50, 560, 900),  height: hPct(0.50, 420, 500) },
+      photos:       { width: wPct(0.60, 620, 1100), height: hPct(0.72, 460, 760) },
+      contacts:     { width: wPct(0.52, 580, 960),  height: hPct(0.68, 460, 720) },
+      achievements: { width: wPct(0.34, 440, 600),  height: hPct(0.68, 480, 700) },
+    };
+  }, [desktop]);
 
   const bringToFront = useCallback((id: string) => {
     setWindows(prev => {
@@ -174,20 +194,22 @@ function DesktopContent() {
              <DesktopIcon label="Achievements" onDoubleClick={() => openApp('achievements')} />
           </div>
 
-          <div className="absolute top-9 left-0 w-full h-[calc(100%-36px)]">
-            <WindowLayout id="notes" title="Notes" dockId="dock-icon-notes" isOpen={windows.notes.isOpen} isMinimized={windows.notes.isMinimized} onClose={() => closeApp('notes')} onMinimize={() => toggleApp('notes')} onFocus={() => bringToFront('notes')} zIndex={windows.notes.z} width={'60%'} minWidth={300} minHeight={700} x={centerPosition.x} y={centerPosition.y} sidebar={true}><NotesApp onOpenApp={openApp} /></WindowLayout>
-            <WindowLayout id="siri" title="Siri" dockId="dock-icon-siri" isOpen={windows.siri.isOpen} isMinimized={windows.siri.isMinimized} onClose={() => closeApp('siri')} onMinimize={() => toggleApp('siri')} onFocus={() => bringToFront('siri')} zIndex={windows.siri.z} width={500} height={600}><SiriApp onOpenApp={openApp} /></WindowLayout>
-            <WindowLayout id="mail" title="Mail" dockId="dock-icon-mail" isOpen={windows.mail.isOpen} isMinimized={windows.mail.isMinimized} onClose={() => closeApp('mail')} onMinimize={() => toggleApp('mail')} onFocus={() => bringToFront('mail')} zIndex={windows.mail.z} width={900} height={600} sidebar={true}><MailApp /></WindowLayout>
-            <WindowLayout id="resume" title="Resume" dockId="dock-icon-resume" isOpen={windows.resume.isOpen} isMinimized={windows.resume.isMinimized} onClose={() => closeApp('resume')} onMinimize={() => toggleApp('resume')} onFocus={() => bringToFront('resume')} zIndex={windows.resume.z}><ResumeApp /></WindowLayout>
-            <WindowLayout id="vscode" title="VS Code" dockId="dock-icon-vscode" isOpen={windows.vscode.isOpen} isMinimized={windows.vscode.isMinimized} onClose={() => closeApp('vscode')} onMinimize={() => toggleApp('vscode')} onFocus={() => bringToFront('vscode')} zIndex={windows.vscode.z} width={900} height={600} sidebar={true}><VSCodeApp /></WindowLayout>
-            <WindowLayout id="finder" title="Finder" dockId="dock-icon-finder" isOpen={windows.finder.isOpen} isMinimized={windows.finder.isMinimized} onClose={() => closeApp('finder')} onMinimize={() => toggleApp('finder')} onFocus={() => bringToFront('finder')} zIndex={windows.finder.z} width={800} height={500} sidebar={true}><FinderApp /></WindowLayout>
-            <WindowLayout id="terminal" title="Terminal" dockId="dock-icon-terminal" isOpen={windows.terminal.isOpen} isMinimized={windows.terminal.isMinimized} onClose={() => closeApp('terminal')} onMinimize={() => toggleApp('terminal')} onFocus={() => bringToFront('terminal')} zIndex={windows.terminal.z} width={600} height={600}><TerminalApp bootMode={terminalBootMode} onBootComplete={handleTerminalBootComplete} /></WindowLayout>
-            <WindowLayout id="safari" title="Safari" dockId="dock-icon-safari" isOpen={windows.safari.isOpen} isMinimized={windows.safari.isMinimized} onClose={() => closeApp('safari')} onMinimize={() => toggleApp('safari')} onFocus={() => bringToFront('safari')} zIndex={windows.safari.z} width={850} height={550} sidebar={true}><SafariApp /></WindowLayout>
-            <WindowLayout id="calculator" title="Calculator" dockId="dock-icon-calculator" isOpen={windows.calculator.isOpen} isMinimized={windows.calculator.isMinimized} onClose={() => closeApp('calculator')} onMinimize={() => toggleApp('calculator')} onFocus={() => bringToFront('calculator')} zIndex={windows.calculator.z} width={300} height={550}><CalculatorApp /></WindowLayout>
-            <WindowLayout id="music" title="Music" dockId="dock-icon-music" isOpen={windows.music.isOpen} isMinimized={windows.music.isMinimized} onClose={() => closeApp('music')} onMinimize={() => toggleApp('music')} onFocus={() => bringToFront('music')} zIndex={windows.music.z} minWidth={900} width={'40%'} minHeight={500} height={'30%'}><MusicApp /></WindowLayout>
-            <WindowLayout id="photos" title="Photos" dockId="dock-icon-photos" isOpen={windows.photos.isOpen} isMinimized={windows.photos.isMinimized} onClose={() => closeApp('photos')} onMinimize={() => toggleApp('photos')} onFocus={() => bringToFront('photos')} zIndex={windows.photos.z} width={'70%'} height={'80%'}><PhotosApp /></WindowLayout>
-            <WindowLayout id="contacts" title="Contacts" dockId="dock-icon-contacts" isOpen={windows.contacts.isOpen} isMinimized={windows.contacts.isMinimized} onClose={() => closeApp('contacts')} onMinimize={() => toggleApp('contacts')} onFocus={() => bringToFront('contacts')} zIndex={windows.contacts.z} width={'70%'} height={'80%'}><ContactsApp /></WindowLayout>
-            <WindowLayout id="achievements" title="Achievements" dockId="dock-icon-achievements" isOpen={windows.achievements.isOpen} isMinimized={windows.achievements.isMinimized} onClose={() => closeApp('achievements')} onMinimize={() => toggleApp('achievements')} onFocus={() => bringToFront('achievements')} zIndex={windows.achievements.z} width={600} height={700}><AchievementsApp /></WindowLayout>
+          <div ref={windowContainerRef} className="absolute top-9 left-0 w-full h-[calc(100%-2.25rem)]">
+          <DesktopSizeProvider value={desktop}>
+            <WindowLayout id="notes" title="Notes" dockId="dock-icon-notes" isOpen={windows.notes.isOpen} isMinimized={windows.notes.isMinimized} onClose={() => closeApp('notes')} onMinimize={() => toggleApp('notes')} onFocus={() => bringToFront('notes')} zIndex={windows.notes.z} width={winSize.notes.width} height={winSize.notes.height} minWidth={320} minHeight={420} sidebar={true}><NotesApp onOpenApp={openApp} /></WindowLayout>
+            <WindowLayout id="siri" title="Siri" dockId="dock-icon-siri" isOpen={windows.siri.isOpen} isMinimized={windows.siri.isMinimized} onClose={() => closeApp('siri')} onMinimize={() => toggleApp('siri')} onFocus={() => bringToFront('siri')} zIndex={windows.siri.z} width={winSize.siri.width} height={winSize.siri.height} minWidth={340} minHeight={420}><SiriApp onOpenApp={openApp} /></WindowLayout>
+            <WindowLayout id="mail" title="Mail" dockId="dock-icon-mail" isOpen={windows.mail.isOpen} isMinimized={windows.mail.isMinimized} onClose={() => closeApp('mail')} onMinimize={() => toggleApp('mail')} onFocus={() => bringToFront('mail')} zIndex={windows.mail.z} width={winSize.mail.width} height={winSize.mail.height} minWidth={520} minHeight={400} sidebar={true}><MailApp /></WindowLayout>
+            <WindowLayout id="resume" title="Resume" dockId="dock-icon-resume" isOpen={windows.resume.isOpen} isMinimized={windows.resume.isMinimized} onClose={() => closeApp('resume')} onMinimize={() => toggleApp('resume')} onFocus={() => bringToFront('resume')} zIndex={windows.resume.z} width={winSize.resume.width} height={winSize.resume.height} minWidth={480} minHeight={420}><ResumeApp /></WindowLayout>
+            <WindowLayout id="vscode" title="VS Code" dockId="dock-icon-vscode" isOpen={windows.vscode.isOpen} isMinimized={windows.vscode.isMinimized} onClose={() => closeApp('vscode')} onMinimize={() => toggleApp('vscode')} onFocus={() => bringToFront('vscode')} zIndex={windows.vscode.z} width={winSize.vscode.width} height={winSize.vscode.height} minWidth={480} minHeight={400} sidebar={true}><VSCodeApp /></WindowLayout>
+            <WindowLayout id="finder" title="Finder" dockId="dock-icon-finder" isOpen={windows.finder.isOpen} isMinimized={windows.finder.isMinimized} onClose={() => closeApp('finder')} onMinimize={() => toggleApp('finder')} onFocus={() => bringToFront('finder')} zIndex={windows.finder.z} width={winSize.finder.width} height={winSize.finder.height} minWidth={480} minHeight={360} sidebar={true}><FinderApp /></WindowLayout>
+            <WindowLayout id="terminal" title="Terminal" dockId="dock-icon-terminal" isOpen={windows.terminal.isOpen} isMinimized={windows.terminal.isMinimized} onClose={() => closeApp('terminal')} onMinimize={() => toggleApp('terminal')} onFocus={() => bringToFront('terminal')} zIndex={windows.terminal.z} width={winSize.terminal.width} height={winSize.terminal.height} minWidth={380} minHeight={360}><TerminalApp bootMode={terminalBootMode} onBootComplete={handleTerminalBootComplete} /></WindowLayout>
+            <WindowLayout id="safari" title="Safari" dockId="dock-icon-safari" isOpen={windows.safari.isOpen} isMinimized={windows.safari.isMinimized} onClose={() => closeApp('safari')} onMinimize={() => toggleApp('safari')} onFocus={() => bringToFront('safari')} zIndex={windows.safari.z} width={winSize.safari.width} height={winSize.safari.height} minWidth={520} minHeight={420} sidebar={true}><SafariApp /></WindowLayout>
+            <WindowLayout id="calculator" title="Calculator" dockId="dock-icon-calculator" isOpen={windows.calculator.isOpen} isMinimized={windows.calculator.isMinimized} onClose={() => closeApp('calculator')} onMinimize={() => toggleApp('calculator')} onFocus={() => bringToFront('calculator')} zIndex={windows.calculator.z} width={winSize.calculator.width} height={winSize.calculator.height} minWidth={260} minHeight={420}><CalculatorApp /></WindowLayout>
+            <WindowLayout id="music" title="Music" dockId="dock-icon-music" isOpen={windows.music.isOpen} isMinimized={windows.music.isMinimized} onClose={() => closeApp('music')} onMinimize={() => toggleApp('music')} onFocus={() => bringToFront('music')} zIndex={windows.music.z} width={winSize.music.width} height={winSize.music.height} minWidth={520} minHeight={420}><MusicApp /></WindowLayout>
+            <WindowLayout id="photos" title="Photos" dockId="dock-icon-photos" isOpen={windows.photos.isOpen} isMinimized={windows.photos.isMinimized} onClose={() => closeApp('photos')} onMinimize={() => toggleApp('photos')} onFocus={() => bringToFront('photos')} zIndex={windows.photos.z} width={winSize.photos.width} height={winSize.photos.height} minWidth={520} minHeight={440}><PhotosApp /></WindowLayout>
+            <WindowLayout id="contacts" title="Contacts" dockId="dock-icon-contacts" isOpen={windows.contacts.isOpen} isMinimized={windows.contacts.isMinimized} onClose={() => closeApp('contacts')} onMinimize={() => toggleApp('contacts')} onFocus={() => bringToFront('contacts')} zIndex={windows.contacts.z} width={winSize.contacts.width} height={winSize.contacts.height} minWidth={560} minHeight={440}><ContactsApp /></WindowLayout>
+            <WindowLayout id="achievements" title="Achievements" dockId="dock-icon-achievements" isOpen={windows.achievements.isOpen} isMinimized={windows.achievements.isMinimized} onClose={() => closeApp('achievements')} onMinimize={() => toggleApp('achievements')} onFocus={() => bringToFront('achievements')} zIndex={windows.achievements.z} width={winSize.achievements.width} height={winSize.achievements.height} minWidth={420} minHeight={480}><AchievementsApp /></WindowLayout>
+          </DesktopSizeProvider>
           </div>
 
           <DockLayout onOpenApp={toggleApp} openApps={Object.fromEntries(Object.entries(windows).map(([k, v]) => [k, v.isOpen && !v.isMinimized]))} />

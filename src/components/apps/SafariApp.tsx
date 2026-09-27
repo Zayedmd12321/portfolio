@@ -471,7 +471,7 @@ export default function SafariApp() {
                    </div>
                    
                    {/* FIXED: Passed the smart handler here */}
-                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 p-4">
+                   <div className="grid grid-cols-2 @sm:grid-cols-4 gap-8 @sm:gap-12 p-4">
                       {bookmarks.map(bookmark => (
                         <BookmarkCard 
                           key={bookmark.id} 

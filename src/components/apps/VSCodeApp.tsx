@@ -21,7 +21,7 @@ export default function VSCodeApp() {
       </div>
 
       {/* Explorer Sidebar */}
-      <div className="w-48 bg-[#252526] hidden md:flex flex-col border-r border-black/20">
+      <div className="w-48 bg-[#252526] hidden @md:flex flex-col border-r border-black/20">
         <div className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400">Explorer</div>
         <div className="px-2">
           <div className="flex items-center gap-1 py-1 bg-[#37373d] text-white cursor-pointer">
@@ -42,9 +42,9 @@ export default function VSCodeApp() {
           <VSCodeFileTab name="profile.ts" active />
         </div>
         
-        <div className="flex-1 p-4 md:p-8 overflow-auto vscode-scroll">
+        <div className="flex-1 p-4 @md:p-8 overflow-auto vscode-scroll min-w-0">
           <div className="flex">
-            <div className="text-[#858585] select-none pr-4 text-right border-r border-[#404040] mr-4 hidden sm:block">
+            <div className="text-[#858585] select-none pr-4 text-right border-r border-[#404040] mr-4 hidden @sm:block">
               {Array.from({length: 15}).map((_, i) => <div key={i}>{i+1}</div>)}
             </div>
             <div className="w-full">

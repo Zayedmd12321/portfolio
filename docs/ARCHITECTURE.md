@@ -31,15 +31,23 @@ The site is a single-page interactive shell that imitates a macOS desktop. There
 
 - `windows`: an object keyed by app id, each entry `{ isOpen, isMinimized, z }`.
 - `bringToFront(id)`, `openApp(id)`, `closeApp(id)`, `toggleApp(id)`.
-- Boot sequence state: `showBootScreen`, `bootSequencePhase`, `terminalBootMode`.
-- `centerPosition` — recalculated on resize so windows open near the middle.
+- Boot sequence state: `showBootScreen`, `terminalBootMode`.
+- `desktop` — measurement of the actual window-container div (via `useDesktopSize(ref)`), used to derive per-window `winSize` presets that adapt to viewport, browser zoom, and root font-size changes.
 
 Each window is rendered by `<WindowLayout>` (`src/components/layouts/WindowLayout.tsx`) which wraps its children in a `react-rnd` frame with:
 
 - Traffic-light controls (close, minimize, maximize) styled via `framer-motion`.
 - `dockId` prop → animates open/minimize/close toward the corresponding dock icon.
 - `sidebar` prop → renders the macOS-style sidebar split.
-- `minWidth` / `minHeight` for resize floors.
+- `minWidth` / `minHeight` for resize floors (auto-lowered when the desktop can't supply them).
+
+### Responsive sizing
+
+- `src/hooks/useDesktopSize.ts` exposes `useDesktopSize(ref)` plus `computeInitialRect` / `clampRect` helpers. It measures the container div with a `ResizeObserver` and listens to viewport resize, so all math tracks the true desktop area (viewport minus the MenuBar).
+- `src/context/DesktopSizeContext.tsx` shares that measurement with every `WindowLayout` via `DesktopSizeProvider value={desktop}`. `page.tsx` mounts the provider inside its window container so children see the same numbers.
+- `WindowLayout` re-centres each window when the viewport changes until the user drags/resizes it. After that it only clamps position and size back into the visible area — user layouts are preserved across browser resizes and never end up off-screen.
+- Maximised windows fill the desktop area (viewport minus MenuBar) so the Dock and MenuBar remain visible.
+- The window content region declares `container-type: inline-size` so apps can use Tailwind v4 `@sm:` / `@md:` / `@lg:` / `@xl:` variants keyed to their own window width rather than the viewport (see `NotesApp`, `VSCodeApp`, `MusicApp`, `PhotosApp`, `AchievementsApp`, `SafariApp`).
 
 ### Adding a window
 

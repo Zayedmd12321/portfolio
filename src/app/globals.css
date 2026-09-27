@@ -5,6 +5,23 @@
   --wallpaper: url('/wallpapers/3.jpg');
 }
 
+/*
+ * Fluid root font size — mirrors the responsive window sizing.
+ * All `rem`-based Tailwind utilities (spacing, sizes, text-sm/lg/…) scale
+ * with the viewport width, so the whole macOS shell shrinks on smaller
+ * displays / higher OS scaling and grows on wider desktops, within safe
+ * accessibility floors and ceilings.
+ *
+ * Curve: 0.5vw + 6px, clamped to [12px, 14px]
+ *   - 1024px viewport → ~11.12px → 12px (floor)
+ *   - 1280px viewport → ~12.40px
+ *   - 1440px viewport → ~13.20px
+ *   - 1920px viewport → ~15.60px → 14px (ceiling)
+ */
+html {
+  font-size: clamp(12px, 0.5vw + 6px, 14px);
+}
+
 html, body {
   height: 100%;
   width: 100%;
