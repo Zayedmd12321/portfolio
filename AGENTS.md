@@ -12,7 +12,7 @@ The two files are kept intentionally close in content but not word-for-word iden
 - **Web proxy:** `src/app/api/proxy/route.ts` uses `puppeteer-core` + `@sparticuz/chromium` to fetch external sites for the Safari app.
 - **State:** three React contexts under `src/context/` — `OSContext` (wallpaper), `NotificationContext`, `AchievementsContext`. Per-user state (wallpaper, achievements) persists to `localStorage`.
 
-Fuller detail is in `README.md` and `docs/ARCHITECTURE.md`.
+Fuller detail is in `README.md`, `docs/ARCHITECTURE.md` (window manager / data flow), and `docs/APPS.md` (per-app rundown).
 
 ## Directory map
 

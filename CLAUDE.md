@@ -80,6 +80,7 @@ Code is the source of truth. If `CLAUDE.md`, `README.md`, or `docs/*` disagrees 
 ## Where to go next
 
 - `docs/ARCHITECTURE.md` — window manager, contexts, data flow.
+- `docs/APPS.md` — per-app rundown (what each Notes/Terminal/Safari/… window shows and how it works).
 - `docs/DEVELOPMENT.md` — local setup and workflow.
 - `docs/DEPLOYMENT.md` — Vercel + Puppeteer notes.
 - `docs/AI_WORKFLOW.md` — inspection / validation checklist tailored to this repo.

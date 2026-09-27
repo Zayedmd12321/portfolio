@@ -115,7 +115,7 @@ portfolio/
 
 ## Architecture in one paragraph
 
-`src/app/layout.tsx` mounts an `OSProvider` (wallpaper state, persisted to `localStorage`). `src/app/page.tsx` is the entire desktop shell — a single client component wrapped in `NotificationProvider` and `AchievementsProvider` that owns a `windows` state map (`isOpen`, `isMinimized`, `z`) for every app, plus helpers (`openApp`, `closeApp`, `toggleApp`, `bringToFront`). It renders one `<WindowLayout>` per app; each `WindowLayout` is a `react-rnd` window that hosts the corresponding `*App` component. See `docs/ARCHITECTURE.md` for the full picture.
+`src/app/layout.tsx` mounts an `OSProvider` (wallpaper state, persisted to `localStorage`). `src/app/page.tsx` is the entire desktop shell — a single client component wrapped in `NotificationProvider` and `AchievementsProvider` that owns a `windows` state map (`isOpen`, `isMinimized`, `z`) for every app, plus helpers (`openApp`, `closeApp`, `toggleApp`, `bringToFront`). It renders one `<WindowLayout>` per app; each `WindowLayout` is a `react-rnd` window that hosts the corresponding `*App` component. See `docs/ARCHITECTURE.md` for the full picture and `docs/APPS.md` for a per-app rundown.
 
 ## Adding a new app
 

@@ -1,6 +1,6 @@
 # Architecture
 
-Deeper reference for how the portfolio is wired together. Skim `README.md` first for the high-level pitch.
+Deeper reference for how the portfolio is wired together. Skim `README.md` first for the high-level pitch. For a per-app rundown (what each Notes/Terminal/Safari/… window shows and how it works), see `docs/APPS.md`.
 
 ## Big picture
 
