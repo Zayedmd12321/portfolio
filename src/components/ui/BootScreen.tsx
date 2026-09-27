@@ -12,24 +12,26 @@ export default function BootScreen({ isLoading, onComplete }: BootScreenProps) {
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-
     if (isLoading) {
-      timer = setInterval(() => {
+      const timer = setInterval(() => {
         setProgress(prev => {
           if (prev >= 90) return 90;
           const increment = Math.max(0.5, (90 - prev) / 10);
           return prev + increment;
         });
       }, 50); // Kept original speed (50ms) for smoother animation
-    } else {
-      setProgress(100);
-      setTimeout(() => {
-        setIsExiting(true);
-      }, 500);
+      return () => clearInterval(timer);
     }
 
-    return () => clearInterval(timer);
+    // Loading finished: jump the bar to 100, then start the exit fade.
+    // setProgress is scheduled via a microtask so we're not calling it
+    // synchronously in the effect body (react-hooks/set-state-in-effect).
+    const finishTimer = setTimeout(() => setProgress(100), 0);
+    const exitTimer = setTimeout(() => setIsExiting(true), 500);
+    return () => {
+      clearTimeout(finishTimer);
+      clearTimeout(exitTimer);
+    };
   }, [isLoading]);
 
   return (
@@ -48,11 +50,12 @@ export default function BootScreen({ isLoading, onComplete }: BootScreenProps) {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-12"
           >
-             {/* UPDATED: Using your local svg file */}
-             <img 
-               src="/icons/apple.svg" 
-               alt="Apple Logo" 
-               className="w-24 h-24 object-contain brightness-0 invert" 
+             {/* Local static apple logo shown at 96×96 during boot. */}
+             {/* eslint-disable-next-line @next/next/no-img-element */}
+             <img
+               src="/icons/apple.svg"
+               alt="Apple Logo"
+               className="w-24 h-24 object-contain brightness-0 invert"
              />
           </motion.div>
 

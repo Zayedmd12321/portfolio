@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Send, Paperclip, PenSquare, Inbox, CheckCircle2, Github, Linkedin, Mail, User, Star } from 'lucide-react';
+import { Send, PenSquare, Inbox, CheckCircle2, Github, Linkedin, Mail, User, type LucideIcon } from 'lucide-react';
 import { useNotification } from '@/context/NotificationContext';
 
 type Section = 'compose' | 'testimonials' | 'success';
@@ -130,7 +130,7 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
               </div>
               <h2 className="text-2xl font-semibold text-white mb-2">Message Sent!</h2>
               <p className="text-white/60 max-w-sm mb-10 text-sm leading-relaxed">
-                 Thanks for reaching out. I usually respond within 24 hours. While you wait, let's connect on other platforms:
+                 Thanks for reaching out. I usually respond within 24 hours. While you wait, let&apos;s connect on other platforms:
               </p>
 
               <div className="grid grid-cols-2 gap-4 w-full max-w-md">
@@ -187,9 +187,17 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
 
 // --- SUB COMPONENTS ---
 
-function SidebarItem({ icon: Icon, label, count, isActive, onClick }: any) {
+interface SidebarItemProps {
+  icon: LucideIcon;
+  label: string;
+  count?: number;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+function SidebarItem({ icon: Icon, label, count, isActive, onClick }: SidebarItemProps) {
   return (
-    <button 
+    <button
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all group cursor-pointer ${
          isActive ? 'bg-[#007AFF] text-white shadow-sm' : 'hover:bg-white/5 text-white/70 hover:text-white'
@@ -206,7 +214,14 @@ function SidebarItem({ icon: Icon, label, count, isActive, onClick }: any) {
   );
 }
 
-function ContactCard({ icon: Icon, label, value, href }: any) {
+interface ContactCardProps {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  href?: string;
+}
+
+function ContactCard({ icon: Icon, label, value, href }: ContactCardProps) {
    return (
       <a href={href} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group cursor-pointer">
          <div className="w-10 h-10 rounded-lg bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -217,27 +232,5 @@ function ContactCard({ icon: Icon, label, value, href }: any) {
             <div className="text-sm text-white font-medium">{value}</div>
          </div>
       </a>
-   )
-}
-
-function TestimonialCard({ name, role, subject, body, date }: any) {
-   return (
-      <div className="bg-[#2a2a2a]/40 border border-white/5 p-4 rounded-xl hover:bg-[#2a2a2a]/60 transition-colors cursor-default group">
-         <div className="flex justify-between items-start mb-1">
-            <div className="flex items-center gap-2">
-               <div className="w-2 h-2 rounded-full bg-blue-500" />
-               <span className="font-semibold text-sm text-white">{name}</span>
-               <span className="text-xs text-white/40">• {role}</span>
-            </div>
-            <span className="text-xs text-white/30">{date}</span>
-         </div>
-         <div className="text-sm font-medium text-white/90 mb-1">{subject}</div>
-         <p className="text-xs text-white/60 leading-relaxed line-clamp-2 group-hover:line-clamp-none transition-all">
-            {body}
-         </p>
-         <div className="mt-3 flex gap-1">
-            {[1,2,3,4,5].map(i => <Star key={i} size={10} className="text-yellow-500 fill-yellow-500" />)}
-         </div>
-      </div>
    )
 }

@@ -5,7 +5,7 @@ import {
   CheckCircle2, User, Layers, Zap, ThumbsUp, Clock
 } from 'lucide-react';
 import { CONTACTS } from '@/data/contacts.data';
-import { Category, Contact } from '@/types/contacts.types';
+import { Category } from '@/types/contacts.types';
 import SidebarItem from '@/components/ui/contacts/ContactSidebarItem';
 import ActionButton from '@/components/ui/contacts/ContactActionButton';
 import InfoBox from '@/components/ui/contacts/ContactInfoBox';
@@ -160,7 +160,7 @@ export default function ContactsApp() {
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Evaluation Note</span>
                </div>
                <p className="text-[15px] text-gray-700 dark:text-gray-200 leading-relaxed font-light">
-                  "{selectedContact.note}"
+                  &ldquo;{selectedContact.note}&rdquo;
                </p>
                {selectedContact.type !== 'action' && (
                    <div className="absolute top-6 right-6 text-green-500 dark:text-green-400 opacity-20">

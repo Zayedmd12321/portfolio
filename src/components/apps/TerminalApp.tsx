@@ -50,10 +50,11 @@ export default function TerminalApp({ bootMode = false, onBootComplete }: Termin
   useEffect(() => {
     if (bootMode && isBootAnimating) {
       let currentDelay = 500; // Initial delay
-      
+      const timeouts: NodeJS.Timeout[] = [];
+
       BOOT_SEQUENCE.forEach((step, index) => {
         currentDelay += step.delay;
-        
+
         const timeout = setTimeout(() => {
           if (step.isLoading) {
             // Add loading line
@@ -68,21 +69,24 @@ export default function TerminalApp({ bootMode = false, onBootComplete }: Termin
               return [...prev, { type: 'log', content: step.content }];
             });
           }
-          
+
           // Complete boot sequence
           if (index === BOOT_SEQUENCE.length - 1) {
-            setTimeout(() => {
+            const completeTimeout = setTimeout(() => {
               setIsBootAnimating(false);
               onBootComplete?.();
             }, 100);
+            timeouts.push(completeTimeout);
           }
         }, currentDelay);
-        
-        bootTimeoutRef.current.push(timeout);
+
+        timeouts.push(timeout);
       });
-      
+
+      bootTimeoutRef.current = timeouts;
+
       return () => {
-        bootTimeoutRef.current.forEach(clearTimeout);
+        timeouts.forEach(clearTimeout);
       };
     }
   }, [bootMode, isBootAnimating, onBootComplete]);
@@ -100,7 +104,7 @@ export default function TerminalApp({ bootMode = false, onBootComplete }: Termin
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       const newLine = { type: 'cmd', content: `${terminalUsername}@${terminalHost} ${terminalPrompt} ${input}` };
-      let newHistory = [...history, newLine];
+      const newHistory = [...history, newLine];
       
       const trimmedInput = input.trim();
       

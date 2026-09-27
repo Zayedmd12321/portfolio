@@ -1,6 +1,6 @@
 'use client';
 import React, { useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform, MotionValue } from 'framer-motion';
+import { motion, useSpring, useTransform, MotionValue } from 'framer-motion';
 
 const BASE_WIDTH = 65;
 const MAX_WIDTH = 110;
@@ -59,6 +59,10 @@ export function DockIcon({
         whileTap={{ scale: 0.9, translateY: 5 }}
         className="aspect-square rounded-2xl flex items-center justify-center relative transition-colors cursor-pointer"
       >
+        {/* Local dock icon whose width is driven by a framer-motion spring.
+            The width is only known at animation time, so we keep it as a
+            plain <img> rather than fighting next/image's width prop. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={name}

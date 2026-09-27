@@ -59,20 +59,20 @@ export default function VSCodeApp() {
                 </div>
                 
                 <div className="pl-6">
-                   <span className="text-[#9cdcfe]">name:</span> <span className="text-[#ce9178]">'{profileData.name}'</span>,
+                   <span className="text-[#9cdcfe]">name:</span> <span className="text-[#ce9178]">{`'${profileData.name}'`}</span>,
                 </div>
                 <div className="pl-6">
-                   <span className="text-[#9cdcfe]">education:</span> <span className="text-[#ce9178]">'{profileData.education}'</span>,
+                   <span className="text-[#9cdcfe]">education:</span> <span className="text-[#ce9178]">{`'${profileData.education}'`}</span>,
                 </div>
                 <div className="pl-6">
-                   <span className="text-[#9cdcfe]">focus:</span> <span className="text-[#ce9178]">'{profileData.focus}'</span>,
+                   <span className="text-[#9cdcfe]">focus:</span> <span className="text-[#ce9178]">{`'${profileData.focus}'`}</span>,
                 </div>
                 <div className="pl-6">
                    <span className="text-[#9cdcfe]">techStack:</span> <span className="text-[#d4d4d4]">[</span>
                 </div>
                 {profileData.techStack.map((tech, idx) => (
                   <div key={idx} className="pl-12">
-                    <span className="text-[#ce9178]">'{tech}'</span>{idx < profileData.techStack.length - 1 ? ',' : ''}
+                    <span className="text-[#ce9178]">{`'${tech}'`}</span>{idx < profileData.techStack.length - 1 ? ',' : ''}
                   </div>
                 ))}
                 <div className="pl-6">

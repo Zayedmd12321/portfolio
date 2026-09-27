@@ -1,8 +1,8 @@
 // Finder sidebar and file data
-import { HardDrive, Clock, AppWindow, Download, Cloud } from 'lucide-react';
+import { HardDrive, Clock, AppWindow, Download, Cloud, type LucideIcon } from 'lucide-react';
 
 export interface SidebarItemConfig {
-  icon: any;
+  icon: LucideIcon;
   label: string;
 }
 

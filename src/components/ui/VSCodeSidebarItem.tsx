@@ -1,8 +1,9 @@
 'use client';
 import React from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 interface VSCodeSidebarItemProps {
-  icon: any;
+  icon: LucideIcon;
   active?: boolean;
 }
 

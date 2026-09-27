@@ -1,6 +1,6 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import MenuBarLayout from '@/components/layouts/MenuBarLayout';
 import DockLayout from '@/components/layouts/DockLayout';
 import WindowLayout from '@/components/layouts/WindowLayout';
@@ -30,7 +30,6 @@ function DesktopContent() {
   // --- Boot & Mount State ---
   const [isMounted, setIsMounted] = useState(false);
   const [showBootScreen, setShowBootScreen] = useState(true);
-  const [bootSequencePhase, setBootSequencePhase] = useState<'boot' | 'terminal' | 'complete'>('boot');
   const [terminalBootMode, setTerminalBootMode] = useState(true);
   
   const [windows, setWindows] = useState({
@@ -72,33 +71,41 @@ function DesktopContent() {
     };
   }, []);
 
-  // --- CRITICAL: REGISTER ACHIEVEMENT OPENER ---
+  const bringToFront = useCallback((id: string) => {
+    setWindows(prev => {
+      const highestZ = Math.max(...Object.values(prev).map(w => w.z));
+      return {
+        ...prev,
+        [id as keyof typeof prev]: { ...prev[id as keyof typeof prev], z: highestZ + 1 }
+      };
+    });
+  }, []);
+
+  // Register the callback used by AchievementsContext to open the Achievements window.
   useEffect(() => {
-     setOpenAchievementsApp(() => {
-         setWindows(prev => {
-             const highestZ = Math.max(...Object.values(prev).map(w => w.z));
-             return { 
-                 ...prev, 
-                 achievements: { isOpen: true, isMinimized: false, z: highestZ + 1 } 
-             };
-         });
-     });
+    setOpenAchievementsApp(() => {
+      setWindows(prev => {
+        const highestZ = Math.max(...Object.values(prev).map(w => w.z));
+        return {
+          ...prev,
+          achievements: { isOpen: true, isMinimized: false, z: highestZ + 1 }
+        };
+      });
+    });
   }, [setOpenAchievementsApp]);
 
-  // Boot sequence effect
-  useEffect(() => {
-    if (!showBootScreen && bootSequencePhase === 'boot') {
-      setBootSequencePhase('terminal');
-      setWindows(prev => ({ ...prev, terminal: { ...prev.terminal, isOpen: true, isMinimized: false } }));
-      bringToFront('terminal');
-    }
-  }, [showBootScreen, bootSequencePhase]);
+  // Boot screen finished → advance to the terminal phase.
+  // Called from BootScreen's onComplete so we don't need a boot-tracking effect.
+  const handleBootScreenComplete = () => {
+    setShowBootScreen(false);
+    setWindows(prev => ({ ...prev, terminal: { ...prev.terminal, isOpen: true, isMinimized: false } }));
+    bringToFront('terminal');
+  };
 
   const handleTerminalBootComplete = () => {
     setTerminalBootMode(false);
-    setBootSequencePhase('complete');
     unlockAchievement('boot_up');
-    
+
     setTimeout(() => {
       setWindows(prev => ({ ...prev, notes: { ...prev.notes, isOpen: true, isMinimized: false } }));
       bringToFront('notes');
@@ -108,19 +115,11 @@ function DesktopContent() {
     }, 800);
   };
 
-  const bringToFront = (id: string) => {
-    const highestZ = Math.max(...Object.values(windows).map(w => w.z));
-    setWindows(prev => ({
-      ...prev,
-      [id as keyof typeof windows]: { ...prev[id as keyof typeof windows], z: highestZ + 1 }
-    }));
-  };
-
   const handleAppOpen = (id: string) => {
     if (id === 'terminal') unlockAchievement('terminal_wizard');
     if (id === 'music') unlockAchievement('music_lover');
     if (id === 'mail' || id === 'resume') unlockAchievement('recruiter');
-    
+
     const currentOpenCount = Object.values(windows).filter(w => w.isOpen).length;
     if (!windows[id as keyof typeof windows].isOpen && currentOpenCount >= 4) {
       unlockAchievement('explorer');
@@ -156,7 +155,7 @@ function DesktopContent() {
 
   return (
     <main className="w-screen h-screen relative selection:bg-blue-500/30">
-      {showBootScreen && <BootScreen isLoading={!isMounted} onComplete={() => setShowBootScreen(false)} />}
+      {showBootScreen && <BootScreen isLoading={!isMounted} onComplete={handleBootScreenComplete} />}
 
       <motion.div 
         className="w-full h-full relative"

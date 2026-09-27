@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Rnd } from 'react-rnd';
 import { X, Minus, ChevronsLeftRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,24 +25,32 @@ interface WindowLayoutProps {
 }
 
 export default function WindowLayout({
-  id, title, isOpen, isMinimized, onClose, onMinimize, onFocus, zIndex, children,
+  title, isOpen, isMinimized, onClose, onMinimize, onFocus, zIndex, children,
   width = 800, height = 600, x = 100, y = 50, sidebar = false, dockId, minWidth = 350, minHeight = 250
 }: WindowLayoutProps) {
   const [isHoveringLights, setIsHoveringLights] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [position, setPosition] = useState({ x, y });
   const [size, setSize] = useState({ width, height });
-  const [dockDelta, setDockDelta] = useState({ x: 0, y: 0 });
 
-  // Reset maximized state when window is minimized or closed
-  useEffect(() => {
+  // Reset maximized state when window is minimized or closed.
+  // React docs pattern for "adjusting state when a prop changes":
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  const [prevIsMinimized, setPrevIsMinimized] = useState(isMinimized);
+  if (prevIsOpen !== isOpen || prevIsMinimized !== isMinimized) {
+    setPrevIsOpen(isOpen);
+    setPrevIsMinimized(isMinimized);
     if (isMinimized || !isOpen) {
       setIsMaximized(false);
     }
-  }, [isMinimized, isOpen]);
+  }
 
-  useEffect(() => {
-    if (!isOpen && !isMinimized) return;
+  // Compute dock delta as derived state — no effect needed.
+  const dockDelta = useMemo(() => {
+    if (typeof document === 'undefined' || (!isOpen && !isMinimized)) {
+      return { x: 0, y: 0 };
+    }
 
     const dockElement = dockId ? document.getElementById(dockId) : null;
     let targetX = window.innerWidth / 2;
@@ -53,17 +61,14 @@ export default function WindowLayout({
       targetX = rect.left + rect.width / 2;
       targetY = rect.top + rect.height / 2;
     }
-    
+
     const numWidth = typeof size.width === 'string' ? parseInt(size.width) : size.width;
     const numHeight = typeof size.height === 'string' ? parseInt(size.height) : size.height;
-    
+
     const windowCenterX = position.x + (numWidth / 2);
     const windowBottomY = position.y + numHeight;
-    const deltaX = targetX - windowCenterX;
-    const deltaY = targetY - windowBottomY;
-
-    setDockDelta({ x: deltaX, y: deltaY });
-  }, [position, size, isOpen, dockId]);
+    return { x: targetX - windowCenterX, y: targetY - windowBottomY };
+  }, [position, size, isOpen, isMinimized, dockId]);
 
   const variants = {
     initial: {

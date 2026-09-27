@@ -11,6 +11,9 @@ export function DesktopIcon({ label, isPdf, onDoubleClick }: DesktopIconProps) {
   return (
     <div className="group flex flex-col items-center gap-1.5 w-21 cursor-pointer" onDoubleClick={onDoubleClick}>
       <div className="w-15 h-15 rounded-lg flex items-center justify-center transition-colors group-hover:bg-white/10 border border-transparent group-hover:border-white/10 group-active:bg-blue-600/30">
+        {/* External Wikimedia asset URL — cannot use next/image without adding
+            an upload.wikimedia.org remotePatterns entry, which is out of scope. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={isPdf ? "https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" : "https://upload.wikimedia.org/wikipedia/commons/c/c9/Finder_Icon_macOS_Big_Sur.png"}
           className="w-13 h-13 object-contain drop-shadow-lg"

@@ -26,13 +26,18 @@ export async function GET(request: NextRequest) {
       ? await chromium.executablePath() 
       : localExecutablePath;
 
-    browser = await puppeteer.launch({
+    // `ignoreHTTPSErrors` is accepted by the underlying launcher but no longer
+    // in puppeteer-core's LaunchOptions type — cast the options object narrowly.
+    const launchOptions: Parameters<typeof puppeteer.launch>[0] & {
+      ignoreHTTPSErrors?: boolean;
+    } = {
       args: isProduction ? [...chromium.args, '--no-zygote'] : puppeteer.defaultArgs(),
       defaultViewport: { width: 1920, height: 1080 },
       executablePath: executablePath,
       headless: true,
       ignoreHTTPSErrors: true,
-    } as any);
+    };
+    browser = await puppeteer.launch(launchOptions);
 
     const page = await browser.newPage();
 
@@ -44,11 +49,11 @@ export async function GET(request: NextRequest) {
 
     // 2. Load the Page (Don't wait for network idle, just load the skeleton)
     try {
-      await page.goto(targetUrl, { 
-        waitUntil: 'domcontentloaded', 
-        timeout: 15000 
+      await page.goto(targetUrl, {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000
       });
-    } catch (e) {
+    } catch {
       console.log("Initial load timeout (continuing anyway)...");
     }
 
@@ -77,7 +82,7 @@ export async function GET(request: NextRequest) {
                 }, 100); // Scroll every 100ms
             });
         });
-    } catch (e) {
+    } catch {
         console.log("Scroll failed");
     }
 
@@ -131,16 +136,17 @@ export async function GET(request: NextRequest) {
       headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' },
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Proxy Error:', error);
-    return new NextResponse(`<h2>Error</h2><p>${error.message}</p>`, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return new NextResponse(`<h2>Error</h2><p>${message}</p>`, { status: 500 });
   } finally {
     if (browser) {
       try {
         const pages = await browser.pages();
         await Promise.all(pages.map(p => p.close()));
         await browser.close();
-      } catch (e) {
+      } catch {
         // Ignore EBUSY errors
       }
     }

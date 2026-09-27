@@ -1,5 +1,12 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useCallback,
+  useSyncExternalStore,
+} from 'react';
 import { useNotification } from '@/context/NotificationContext';
 import { ACHIEVEMENTS } from '@/data/achievements.data';
 
@@ -13,17 +20,50 @@ interface AchievementsContextType {
 
 const AchievementsContext = createContext<AchievementsContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'macOS-achievements';
+
+const unlockedListeners = new Set<() => void>();
+let cachedIds: string[] = [];
+let cachedRaw: string | null = null;
+
+function readIdsFromStorage(): string[] {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw === cachedRaw) return cachedIds;
+  cachedRaw = raw;
+  try {
+    cachedIds = raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    cachedIds = [];
+  }
+  return cachedIds;
+}
+
+function subscribeUnlocked(listener: () => void) {
+  unlockedListeners.add(listener);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY) listener();
+  };
+  window.addEventListener('storage', onStorage);
+  return () => {
+    unlockedListeners.delete(listener);
+    window.removeEventListener('storage', onStorage);
+  };
+}
+
+const EMPTY_IDS: string[] = [];
+function getUnlockedServerSnapshot(): string[] {
+  return EMPTY_IDS;
+}
+
 export function AchievementsProvider({ children }: { children: React.ReactNode }) {
-  const [unlockedIds, setUnlockedIds] = useState<string[]>([]);
+  const unlockedIds = useSyncExternalStore(
+    subscribeUnlocked,
+    readIdsFromStorage,
+    getUnlockedServerSnapshot,
+  );
   const { showNotification } = useNotification();
   const openAppRef = useRef<(() => void) | null>(null);
   const prevLevelRef = useRef(1);
-
-  // Load from storage
-  useEffect(() => {
-    const saved = localStorage.getItem('macOS-achievements');
-    if (saved) setUnlockedIds(JSON.parse(saved));
-  }, []);
 
   const totalXP = unlockedIds.reduce((acc, id) => {
     const achievement = ACHIEVEMENTS.find(a => a.id === id);
@@ -32,7 +72,6 @@ export function AchievementsProvider({ children }: { children: React.ReactNode }
 
   const level = Math.floor(totalXP / 200) + 1;
 
-  // Level Up Logic
   useEffect(() => {
     if (level > prevLevelRef.current) {
       showNotification(
@@ -46,24 +85,24 @@ export function AchievementsProvider({ children }: { children: React.ReactNode }
   }, [level, showNotification]);
 
   const unlockAchievement = useCallback((id: string) => {
-    setUnlockedIds(prev => {
-      if (prev.includes(id)) return prev;
+    const current = readIdsFromStorage();
+    if (current.includes(id)) return;
 
-      const achievement = ACHIEVEMENTS.find(a => a.id === id);
-      if (achievement) {
-        const newUnlocked = [...prev, id];
-        localStorage.setItem('macOS-achievements', JSON.stringify(newUnlocked));
+    const achievement = ACHIEVEMENTS.find(a => a.id === id);
+    if (!achievement) return;
 
-        showNotification(
-          `Unlocked: ${achievement.title}`,
-          `+${achievement.xp} XP earned!`,
-          'success',
-          () => openAppRef.current?.()
-        );
-        return newUnlocked;
-      }
-      return prev;
-    });
+    const newUnlocked = [...current, id];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUnlocked));
+    // Invalidate cache and notify subscribers so useSyncExternalStore re-reads.
+    cachedRaw = null;
+    unlockedListeners.forEach(listener => listener());
+
+    showNotification(
+      `Unlocked: ${achievement.title}`,
+      `+${achievement.xp} XP earned!`,
+      'success',
+      () => openAppRef.current?.()
+    );
   }, [showNotification]);
 
   const setOpenAchievementsApp = useCallback((callback: () => void) => {

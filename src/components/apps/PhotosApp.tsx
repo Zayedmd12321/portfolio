@@ -100,8 +100,11 @@ export default function PhotosApp() {
                 onClick={() => handlePhotoClick(photo)}
               >
                 <div className="w-full h-full flex items-center justify-center p-6 relative">
-                  <img 
-                    src={photo.src} 
+                  {/* Local photo asset with a custom onError swap-fallback.
+                      Kept as <img> so the fallback assignment stays trivial. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photo.src}
                     alt={photo.title}
                     className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                     onError={(e) => {
@@ -161,8 +164,10 @@ export default function PhotosApp() {
               {/* Image Container */}
               <div className="bg-[#1e1e1e] rounded-xl border border-white/10 overflow-hidden">
                 <div className="flex items-center justify-center p-12 min-h-125">
-                  <img 
-                    src={selectedPhoto.src} 
+                  {/* Local photo asset shown in a lightbox with intrinsic max-h/max-w constraints. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={selectedPhoto.src}
                     alt={selectedPhoto.title}
                     className="max-w-full max-h-[70vh] object-contain"
                   />

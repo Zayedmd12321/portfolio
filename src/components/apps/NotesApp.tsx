@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Note, initialNotes } from '@/data/notes.data';
-import { profileData, skills, experiences, projects } from '@/data/portfolio.data';
+import { profileData, skills, experiences, projects, type Skill, type Projects } from '@/data/portfolio.data';
 
 export default function NotesApp({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
   const [notes, setNotes] = useState<Note[]>(initialNotes);
@@ -287,6 +287,10 @@ function ProfileSection({ centered }: { centered?: boolean }) {
     <div className={`space-y-6 ${centered ? 'flex flex-col items-center text-center' : ''} animate-in fade-in slide-in-from-bottom-4 duration-700 pt-8`}>
       <div className="relative group w-40 h-40">
           <div className="absolute inset-0 rounded-full bg-linear-to-tr from-[#dcae48] to-purple-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+          {/* Local static profile image. Kept as a plain <img> to preserve the
+              existing full-bleed rounded/blur styling without introducing
+              next/image layout wrappers. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/me.jpg" alt="Profile" className="relative w-full h-full rounded-full object-cover border-2 border-white/10 shadow-2xl z-10" />
       </div>
       
@@ -402,6 +406,9 @@ function ExperienceSection() {
                       className="flex items-center gap-1.5 text-[10px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-sm border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                     >
                       {techIcon && (
+                        /* Local skill icon. Kept as <img> so the tiny 12px
+                           inline layout matches the existing style. */
+                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img src={techIcon} alt={tech} className="w-3 h-3 object-contain" />
                       )}
                       {tech}
@@ -435,13 +442,16 @@ function TechSection({ columns }: { columns?: number }) {
   );
 }
 
-function TechCard({ name, desc, file }: any) {
+function TechCard({ name, desc, file }: Skill) {
   return (
     <div className="flex items-center gap-4 p-4 rounded-xl bg-[#252525] border border-white/5 hover:border-white/10 hover:bg-[#2a2a2a] transition-all duration-200 group cursor-default">
       <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-white/5 bg-[#1e1e1e]`}>
+         {/* Local skill icon with a custom onError hide-fallback. Kept as
+             a plain <img> so that fallback and size stay identical. */}
+         {/* eslint-disable-next-line @next/next/no-img-element */}
          <img src={`/skills/${file}`} alt={name} className="w-7 h-7 object-contain opacity-90 group-hover:opacity-100 transition-opacity" onError={(e) => e.currentTarget.style.display='none'} />
       </div>
-      
+
       <div className="min-w-0 flex flex-col justify-center">
         <div className="text-[15px] font-bold text-gray-100 leading-tight mb-0.5 group-hover:text-white transition-colors">{name}</div>
         <div className="text-[12px] text-gray-500 font-medium truncate group-hover:text-gray-400 transition-colors">{desc}</div>
@@ -450,7 +460,7 @@ function TechCard({ name, desc, file }: any) {
   );
 }
 
-function SocialBtn({ icon, href }: { icon: any, href: string }) {
+function SocialBtn({ icon, href }: { icon: React.ReactNode, href: string }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="p-2 bg-[#252525] rounded-lg text-gray-400 hover:text-white hover:bg-[#dcae48] transition-all duration-300 shadow-sm border border-white/5 hover:border-transparent">
       {icon}
@@ -489,7 +499,7 @@ function ProjectsSection({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
   );
 }
 
-function ProjectCard({ project, onOpenApp }: { project: any; onOpenApp?: (id: string) => void }) {
+function ProjectCard({ project, onOpenApp }: { project: Projects; onOpenApp?: (id: string) => void }) {
   const getTechIcon = (tech: string) => {
     const techMap: { [key: string]: string } = {
       'AWS': 'aws_dark.svg',
@@ -566,9 +576,12 @@ function ProjectCard({ project, onOpenApp }: { project: any; onOpenApp?: (id: st
             return (
               <div key={idx} className="flex items-center gap-2 bg-[#1e1e1e] border border-white/5 px-3 py-2 rounded-lg hover:border-white/10 transition-colors">
                 {icon && (
-                  <img 
-                    src={`/skills/${icon}`} 
-                    alt={tech} 
+                  /* Local skill icon with a custom onError hide-fallback — see
+                     TechCard for the reasoning. */
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={`/skills/${icon}`}
+                    alt={tech}
                     className="w-5 h-5 object-contain"
                     onError={(e) => e.currentTarget.style.display='none'}
                   />

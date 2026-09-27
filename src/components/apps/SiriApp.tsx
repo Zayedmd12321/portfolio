@@ -103,7 +103,7 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
           setHistory(prev => [...prev, { role: 'model', parts: [{ text: data.reply }] }]);
         }
       }
-    } catch (error) {
+    } catch {
         // Fallback for demo if API fails
         setTimeout(() => {
              setHistory(prev => [...prev, { role: 'model', parts: [{ text: "I'm in demo mode (API disconnected). But I'd normally answer that!" }] }]);

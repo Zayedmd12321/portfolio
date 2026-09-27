@@ -1,4 +1,4 @@
-import { Zap, Terminal, Music, Mail, Moon, Cpu, Eye, Layers, Code, Briefcase } from 'lucide-react';
+import { Terminal, Music, Moon, Cpu, Eye, Layers, Briefcase } from 'lucide-react';
 
 export type AchievementCategory = 'system' | 'apps' | 'hidden';
 

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Trophy, Lock, Layers, Zap, Grid, Eye } from 'lucide-react';
+import { Trophy, Lock, Layers, Zap, Grid, Eye, type LucideIcon } from 'lucide-react';
 import { useAchievements } from '@/context/AchievementsContext';
 import { ACHIEVEMENTS, AchievementCategory } from '@/data/achievements.data';
 
@@ -86,7 +86,14 @@ export default function AchievementsApp() {
   );
 }
 
-function SidebarItem({ icon: Icon, label, active, onClick }: any) {
+interface AchievementsSidebarItemProps {
+  icon: LucideIcon;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}
+
+function SidebarItem({ icon: Icon, label, active, onClick }: AchievementsSidebarItemProps) {
     return (
         <button onClick={onClick} className={`w-full text-left px-4 py-2 flex items-center gap-3 transition-colors ${active ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'}`}>
             <Icon size={16} className={active ? 'text-white' : 'text-gray-500 dark:text-gray-400'} />

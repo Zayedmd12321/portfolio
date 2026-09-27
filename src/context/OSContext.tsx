@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useSyncExternalStore } from 'react';
 
 interface OSContextType {
   wallpaper: string;
@@ -8,25 +8,49 @@ interface OSContextType {
 
 const OSContext = createContext<OSContextType | undefined>(undefined);
 
+const WALLPAPER_KEY = 'macOS-wallpaper';
+const DEFAULT_WALLPAPER = '/wallpapers/3.jpg';
+
+const wallpaperListeners = new Set<() => void>();
+
+function subscribeWallpaper(listener: () => void) {
+  wallpaperListeners.add(listener);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === WALLPAPER_KEY) listener();
+  };
+  window.addEventListener('storage', onStorage);
+  return () => {
+    wallpaperListeners.delete(listener);
+    window.removeEventListener('storage', onStorage);
+  };
+}
+
+function getWallpaperSnapshot(): string {
+  return localStorage.getItem(WALLPAPER_KEY) ?? DEFAULT_WALLPAPER;
+}
+
+function getWallpaperServerSnapshot(): string {
+  return DEFAULT_WALLPAPER;
+}
+
 export function OSProvider({ children }: { children: React.ReactNode }) {
-  const [wallpaper, setWallpaper] = useState('/wallpapers/3.jpg');
+  const wallpaper = useSyncExternalStore(
+    subscribeWallpaper,
+    getWallpaperSnapshot,
+    getWallpaperServerSnapshot,
+  );
 
-  // Load saved wallpaper from LocalStorage on mount
-  useEffect(() => {
-    const savedWallpaper = localStorage.getItem('macOS-wallpaper');
-    if (savedWallpaper) {
-      setWallpaper(savedWallpaper);
-    }
-  }, []);
+  const changeWallpaper = (url: string) => {
+    localStorage.setItem(WALLPAPER_KEY, url);
+    wallpaperListeners.forEach(listener => listener());
+  };
 
-  // Handle Wallpaper Changes (Update CSS + Save to Storage)
   useEffect(() => {
     document.documentElement.style.setProperty('--wallpaper', `url(${wallpaper})`);
-    localStorage.setItem('macOS-wallpaper', wallpaper);
   }, [wallpaper]);
 
   return (
-    <OSContext.Provider value={{ wallpaper, changeWallpaper: setWallpaper }}>
+    <OSContext.Provider value={{ wallpaper, changeWallpaper }}>
       {children}
     </OSContext.Provider>
   );

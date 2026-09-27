@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef, useCallback, KeyboardEvent } from 'react';
 import { 
   ChevronLeft, ChevronRight, RotateCw, Lock, 
   Plus, Sidebar, Star, Search, X, Home, Trash2, Loader2, AlertTriangle, ExternalLink
@@ -30,8 +30,8 @@ type BookmarkItem = {
 const isValidUrl = (string: string) => {
   try {
     new URL(string.startsWith('http') ? string : `https://${string}`);
-    return string.includes('.'); 
-  } catch (_) {
+    return string.includes('.');
+  } catch {
     return false;
   }
 };
@@ -82,6 +82,10 @@ export default function SafariApp() {
   const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
   const iframeRefs = useRef<{ [key: string]: HTMLIFrameElement | null }>({});
 
+  const updateTab = useCallback((id: string, updates: Partial<Tab>) => {
+    setTabs(prev => prev.map(tab => tab.id === id ? { ...tab, ...updates } : tab));
+  }, []);
+
   // --- Listen for messages from the Proxy ---
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
@@ -92,17 +96,17 @@ export default function SafariApp() {
         }
 
         if (e.data.type === 'URL_CHANGED') {
-            updateTab(activeTabId, { 
-                displayUrl: e.data.url, 
+            updateTab(activeTabId, {
+                displayUrl: e.data.url,
                 url: e.data.url,
-                warningDismissed: false 
+                warningDismissed: false
             });
         }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [activeTabId]); 
+  }, [activeTabId, updateTab]);
 
 
   // --- Actions ---
@@ -133,10 +137,6 @@ export default function SafariApp() {
     if (activeTabId === tabId) {
       setActiveTabId(newTabs[newTabs.length - 1].id);
     }
-  };
-
-  const updateTab = (id: string, updates: Partial<Tab>) => {
-    setTabs(prev => prev.map(tab => tab.id === id ? { ...tab, ...updates } : tab));
   };
 
   // --- Bookmark Logic ---

@@ -8,28 +8,44 @@ import { MenuDropdown } from '@/components/ui/MenuDropdown';
 import { appleMenuItems } from '@/data/menu.data';
 import { wallpapers } from '@/data/wallpapers.data';
 
+// Minimal shape for the non-standard Battery Status API (Chrome-only).
+interface BatteryManagerLike {
+  level: number;
+  charging: boolean;
+  addEventListener: (event: string, handler: () => void) => void;
+  removeEventListener: (event: string, handler: () => void) => void;
+}
+
 function useBattery() {
-  const [battery, setBattery] = useState({ level: 1, charging: false, loaded: false });
+  // Default assumes "plugged in / full" so we don't have to write state
+  // synchronously inside the effect when the API is unavailable.
+  const [battery, setBattery] = useState({ level: 1, charging: false, loaded: true });
 
   useEffect(() => {
-    // @ts-ignore
-    if (typeof navigator.getBattery === 'function') {
-      // @ts-ignore
-      navigator.getBattery().then((bat) => {
-        const updateBattery = () => {
-          setBattery({
-            level: bat.level,
-            charging: bat.charging,
-            loaded: true,
-          });
-        };
-        updateBattery();
-        bat.addEventListener('levelchange', updateBattery);
-        bat.addEventListener('chargingchange', updateBattery);
-      });
-    } else {
-      setBattery({ level: 1, charging: false, loaded: true });
-    }
+    const getBattery = (
+      navigator as Navigator & { getBattery?: () => Promise<BatteryManagerLike> }
+    ).getBattery;
+    if (typeof getBattery !== 'function') return;
+
+    let bat: BatteryManagerLike | null = null;
+    let updateBattery: (() => void) | null = null;
+
+    getBattery.call(navigator).then((b) => {
+      bat = b;
+      updateBattery = () => {
+        setBattery({ level: b.level, charging: b.charging, loaded: true });
+      };
+      updateBattery();
+      b.addEventListener('levelchange', updateBattery);
+      b.addEventListener('chargingchange', updateBattery);
+    });
+
+    return () => {
+      if (bat && updateBattery) {
+        bat.removeEventListener('levelchange', updateBattery);
+        bat.removeEventListener('chargingchange', updateBattery);
+      }
+    };
   }, []);
 
   return battery;
@@ -82,10 +98,12 @@ export default function MenuBarLayout() {
             active={activeMenu === 'apple'} 
             onClick={() => setActiveMenu(activeMenu === 'apple' ? null : 'apple')}
           >
-             <img 
-              src="/icons/apple.svg" 
-              alt="Apple Logo" 
-              className="w-4 h-4 object-contain drop-shadow-sm opacity-90 brightness-0 invert" 
+             {/* Local static apple menu icon, sized to 16×16. */}
+             {/* eslint-disable-next-line @next/next/no-img-element */}
+             <img
+              src="/icons/apple.svg"
+              alt="Apple Logo"
+              className="w-4 h-4 object-contain drop-shadow-sm opacity-90 brightness-0 invert"
             />
           </MenuButton>
           <MenuDropdown isOpen={activeMenu === 'apple'} items={appleMenuItems} />
@@ -156,10 +174,12 @@ export default function MenuBarLayout() {
                                             onClick={() => changeWallpaper(wp.path)}
                                             className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-blue-500 hover:scale-110 transition-all shadow-sm cursor-pointer"
                                         >
-                                            <img 
-                                                src={wp.path} 
+                                            {/* Local wallpaper thumbnails inside a tiny 32px picker. */}
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={wp.path}
                                                 alt={wp.alt}
-                                                className="w-full h-full object-cover" 
+                                                className="w-full h-full object-cover"
                                             />
                                         </button>
                                     ))}

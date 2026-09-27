@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // --- Button Component (Moved Outside) ---
 // By moving it here, React treats it as a stable component, fixing the click issue.
@@ -129,29 +129,31 @@ export default function CalculatorApp() {
     return 'text-[4.5rem]';
   };
 
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    const { key } = event;
-    
-    // Only prevent default for calculator keys to avoid blocking browser shortcuts unnecessarily
-    if (/[0-9]/.test(key) || ['+', '-', '*', '/', '=', 'Enter', 'Escape', 'Backspace', '.'].includes(key)) {
-       // event.preventDefault(); // Optional: Uncomment if page scrolling is an issue
-    }
-
-    if (/[0-9]/.test(key)) inputDigit(key);
-    if (key === '.') inputDot();
-    if (key === 'Enter' || key === '=') { performOperation('='); setActiveOperator(null); }
-    if (key === 'Backspace') setDisplay(display.length > 1 ? display.slice(0, -1) : '0');
-    if (key === 'Escape' || key === 'c' || key === 'C') clear();
-    if (key === '+') performOperation('+');
-    if (key === '-') performOperation('-');
-    if (key === '*') performOperation('*');
-    if (key === '/') performOperation('/');
-  }, [display, waitingForOperand, operator, prevValue]);
+  // Route keyboard events through a ref so we can register the window listener
+  // once and still call the latest closure over display / operator / etc.
+  const latestHandlers = useRef({ inputDigit, inputDot, performOperation, clear, display });
+  useEffect(() => {
+    latestHandlers.current = { inputDigit, inputDot, performOperation, clear, display };
+  });
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const { key } = event;
+      const { inputDigit, inputDot, performOperation, clear, display } = latestHandlers.current;
+
+      if (/[0-9]/.test(key)) inputDigit(key);
+      if (key === '.') inputDot();
+      if (key === 'Enter' || key === '=') { performOperation('='); setActiveOperator(null); }
+      if (key === 'Backspace') setDisplay(display.length > 1 ? display.slice(0, -1) : '0');
+      if (key === 'Escape' || key === 'c' || key === 'C') clear();
+      if (key === '+') performOperation('+');
+      if (key === '-') performOperation('-');
+      if (key === '*') performOperation('*');
+      if (key === '/') performOperation('/');
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  }, []);
 
   return (
     <div className="w-full h-full bg-black text-white p-4 flex flex-col justify-end select-none font-sans cursor-default">
