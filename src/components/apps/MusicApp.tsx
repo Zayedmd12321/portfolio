@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Search, ListMusic, Mic2, Radio, Home, Grid, Loader2, type LucideIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 // --- Types ---
 interface Song {
@@ -55,8 +54,8 @@ export default function MusicApp() {
           title: item.trackName,
           artist: item.artistName,
           album: item.collectionName,
-          // Get higher res image (600x600) instead of default 100x100
-          cover: item.artworkUrl100.replace('100x100bb', '600x600bb'),
+          // 300x300 keeps the grid crisp without pulling 24 × 600px images.
+          cover: item.artworkUrl100.replace('100x100bb', '300x300bb'),
           url: item.previewUrl,
           duration: item.trackTimeMillis
         }));
@@ -71,10 +70,30 @@ export default function MusicApp() {
     }
   }, []);
 
-  // Initial Load: Fetch top songs or use default
+  // Initial Load: Fetch top songs or use default.
+  // Deferred a tick so it doesn't fire during the window's open animation —
+  // parsing 24 tracks + kicking off 24 image loads was jank-inducing.
   useEffect(() => {
-    searchMusic('lofi hip hop'); // Default "Home" screen content
+    const id = window.setTimeout(() => searchMusic('lofi hip hop'), 350);
+    return () => window.clearTimeout(id);
   }, [searchMusic]);
+
+  // Stop playback and release the audio element when the window closes.
+  // Without this, closing the Music window unmounts the component but leaves
+  // the detached <audio> playing in the background.
+  useEffect(() => {
+    return () => {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+        audio.ontimeupdate = null;
+        audio.onended = null;
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +125,13 @@ export default function MusicApp() {
     handleNextRef.current = handleNext;
   }, [handleNext]);
 
+  // Stable song-select handler so memoized SongCards don't re-render when
+  // some other piece of MusicApp state changes.
+  const handleSelectSong = useCallback((song: Song) => {
+    setCurrentSong(song);
+    setIsPlaying(true);
+  }, []);
+
   // --- Audio Logic ---
   // Swap audio source when the current song changes. Play/pause and volume
   // are handled by the dedicated effects below so this one has a minimal
@@ -121,9 +147,17 @@ export default function MusicApp() {
     }
 
     const audio = audioRef.current;
+    // Coalesce timeupdate (fires 4–30x/sec) onto a single rAF tick so the
+    // progress bar re-render can't run more than once per frame.
+    let rafPending = false;
     audio.ontimeupdate = () => {
-      const duration = audio.duration || 30; // Previews are usually 30s
-      setProgress((audio.currentTime / duration) * 100);
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => {
+        rafPending = false;
+        const duration = audio.duration || 30; // Previews are usually 30s
+        setProgress((audio.currentTime / duration) * 100);
+      });
     };
     audio.onended = () => handleNextRef.current();
 
@@ -233,31 +267,13 @@ export default function MusicApp() {
 
               <div className="grid grid-cols-2 @sm:grid-cols-3 @md:grid-cols-4 @lg:grid-cols-5 gap-6 pb-12">
                 {playlist.map((song) => (
-                  <div
+                  <SongCard
                     key={song.id}
-                    onClick={() => { setCurrentSong(song); setIsPlaying(true); }}
-                    className="group cursor-pointer p-4 rounded-xl hover:bg-white/5 transition duration-200 border border-transparent hover:border-white/5"
-                  >
-                    <div className="aspect-square rounded-lg overflow-hidden shadow-lg mb-4 relative">
-                      {/* External iTunes artwork URL — see note above. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={song.cover}
-                        alt={song.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                      />
-                      {/* Hover Overlay */}
-                      <div className={`absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] transition-opacity duration-200 ${currentSong?.id === song.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                           {currentSong?.id === song.id && isPlaying ? (
-                             <Pause className="w-10 h-10 text-white fill-current" />
-                           ) : (
-                             <Play className="w-10 h-10 text-white fill-current" />
-                           )}
-                      </div>
-                    </div>
-                    <h3 className={`font-semibold text-sm truncate ${currentSong?.id === song.id ? 'text-red-400' : 'text-white'}`}>{song.title}</h3>
-                    <p className="text-xs text-white/50 truncate hover:text-white/70 transition-colors">{song.artist}</p>
-                  </div>
+                    song={song}
+                    isCurrent={currentSong?.id === song.id}
+                    isPlaying={isPlaying}
+                    onSelect={handleSelectSong}
+                  />
                 ))}
               </div>
             </>
@@ -277,13 +293,12 @@ export default function MusicApp() {
           }}
         >
            <div className="h-full bg-white/10 w-full absolute top-0 left-0" />
-           <motion.div
+           <div
              className="h-full bg-red-500 relative"
              style={{ width: `${progress}%` }}
-             layoutId="progressbar"
            >
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 shadow-lg transform scale-150 transition-all" />
-           </motion.div>
+           </div>
         </div>
       </div>
     </div>
@@ -297,7 +312,7 @@ interface MusicSidebarItemProps {
   onClick: () => void;
 }
 
-const SidebarItem = ({ icon: Icon, label, active = false, onClick }: MusicSidebarItemProps) => (
+const SidebarItem = React.memo(({ icon: Icon, label, active = false, onClick }: MusicSidebarItemProps) => (
   <button
     onClick={onClick}
     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors text-left ${active ? 'bg-red-500/20 text-red-400 font-medium' : 'text-white/70 hover:bg-white/5 hover:text-white'}`}
@@ -305,4 +320,44 @@ const SidebarItem = ({ icon: Icon, label, active = false, onClick }: MusicSideba
     <Icon size={18} />
     <span className="text-sm">{label}</span>
   </button>
-);
+));
+SidebarItem.displayName = 'MusicSidebarItem';
+
+interface SongCardProps {
+  song: Song;
+  isCurrent: boolean;
+  isPlaying: boolean;
+  onSelect: (song: Song) => void;
+}
+
+// Memoized so changing currentSong/isPlaying re-renders at most two cards
+// (the old current + the new current) instead of all 24.
+const SongCard = React.memo(function SongCard({ song, isCurrent, isPlaying, onSelect }: SongCardProps) {
+  return (
+    <div
+      onClick={() => onSelect(song)}
+      className="group cursor-pointer p-4 rounded-xl hover:bg-white/5 transition duration-200 border border-transparent hover:border-white/5"
+    >
+      <div className="aspect-square rounded-lg overflow-hidden shadow-lg mb-4 relative">
+        {/* External iTunes artwork URL. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={song.cover}
+          alt={song.title}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+        />
+        <div className={`absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] transition-opacity duration-200 ${isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+          {isCurrent && isPlaying ? (
+            <Pause className="w-10 h-10 text-white fill-current" />
+          ) : (
+            <Play className="w-10 h-10 text-white fill-current" />
+          )}
+        </div>
+      </div>
+      <h3 className={`font-semibold text-sm truncate ${isCurrent ? 'text-red-400' : 'text-white'}`}>{song.title}</h3>
+      <p className="text-xs text-white/50 truncate hover:text-white/70 transition-colors">{song.artist}</p>
+    </div>
+  );
+});

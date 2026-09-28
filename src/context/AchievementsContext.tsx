@@ -5,20 +5,28 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   useSyncExternalStore,
 } from 'react';
-import { useNotification } from '@/context/NotificationContext';
+import { useNotificationApi } from '@/context/NotificationContext';
 import { ACHIEVEMENTS } from '@/data/achievements.data';
 
-interface AchievementsContextType {
+interface AchievementsState {
   unlockedIds: string[];
   totalXP: number;
   level: number;
+}
+
+interface AchievementsApi {
   unlockAchievement: (id: string) => void;
   setOpenAchievementsApp: (callback: () => void) => void;
 }
 
-const AchievementsContext = createContext<AchievementsContextType | undefined>(undefined);
+// Split contexts: state changes (unlocks, level-ups) only re-render the
+// AchievementsApp; every consumer that just calls unlockAchievement reads
+// the stable API context and does not re-render on state changes.
+const AchievementsStateContext = createContext<AchievementsState | undefined>(undefined);
+const AchievementsApiContext = createContext<AchievementsApi | undefined>(undefined);
 
 const STORAGE_KEY = 'macOS-achievements';
 
@@ -61,14 +69,17 @@ export function AchievementsProvider({ children }: { children: React.ReactNode }
     readIdsFromStorage,
     getUnlockedServerSnapshot,
   );
-  const { showNotification } = useNotification();
+  const { showNotification } = useNotificationApi();
   const openAppRef = useRef<(() => void) | null>(null);
   const prevLevelRef = useRef(1);
 
-  const totalXP = unlockedIds.reduce((acc, id) => {
-    const achievement = ACHIEVEMENTS.find(a => a.id === id);
-    return acc + (achievement?.xp || 0);
-  }, 0);
+  const totalXP = useMemo(
+    () => unlockedIds.reduce((acc, id) => {
+      const achievement = ACHIEVEMENTS.find(a => a.id === id);
+      return acc + (achievement?.xp || 0);
+    }, 0),
+    [unlockedIds],
+  );
 
   const level = Math.floor(totalXP / 200) + 1;
 
@@ -109,15 +120,35 @@ export function AchievementsProvider({ children }: { children: React.ReactNode }
     openAppRef.current = callback;
   }, []);
 
+  const state = useMemo<AchievementsState>(
+    () => ({ unlockedIds, totalXP, level }),
+    [unlockedIds, totalXP, level],
+  );
+  const api = useMemo<AchievementsApi>(
+    () => ({ unlockAchievement, setOpenAchievementsApp }),
+    [unlockAchievement, setOpenAchievementsApp],
+  );
+
   return (
-    <AchievementsContext.Provider value={{ unlockedIds, totalXP, level, unlockAchievement, setOpenAchievementsApp }}>
-      {children}
-    </AchievementsContext.Provider>
+    <AchievementsApiContext.Provider value={api}>
+      <AchievementsStateContext.Provider value={state}>
+        {children}
+      </AchievementsStateContext.Provider>
+    </AchievementsApiContext.Provider>
   );
 }
 
-export const useAchievements = () => {
-  const context = useContext(AchievementsContext);
-  if (!context) throw new Error('useAchievements must be used within AchievementsProvider');
-  return context;
-};
+export function useAchievementsState() {
+  const ctx = useContext(AchievementsStateContext);
+  if (!ctx) throw new Error('useAchievementsState must be used within AchievementsProvider');
+  return ctx;
+}
+
+export function useAchievementsApi() {
+  const ctx = useContext(AchievementsApiContext);
+  if (!ctx) throw new Error('useAchievementsApi must be used within AchievementsProvider');
+  return ctx;
+}
+
+// Backwards-compatible combined hook — re-renders on any state change.
+export const useAchievements = () => ({ ...useAchievementsState(), ...useAchievementsApi() });

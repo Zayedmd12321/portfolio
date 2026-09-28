@@ -1,10 +1,10 @@
 'use client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Command, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
-import { useNotification } from '@/context/NotificationContext';
+import { useNotificationState } from '@/context/NotificationContext';
 
 export default function Notification() {
-  const { isVisible, notification } = useNotification();
+  const { isVisible, notification } = useNotificationState();
 
   if (!notification || !isVisible) return null;
 

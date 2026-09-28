@@ -20,14 +20,20 @@ import AchievementsApp from '@/components/apps/AchievementsApp';
 import ContactsApp from '@/components/apps/ContactsApp';
 import PhotosApp from '@/components/apps/PhotosApp';
 import { DesktopIcon } from '@/components/ui/DesktopIcon';
-import { NotificationProvider, useNotification } from '@/context/NotificationContext';
-import { AchievementsProvider, useAchievements } from '@/context/AchievementsContext';
+import { NotificationProvider, useNotificationApi } from '@/context/NotificationContext';
+import { AchievementsProvider, useAchievementsApi } from '@/context/AchievementsContext';
 import { DesktopSizeProvider } from '@/context/DesktopSizeContext';
 import { useDesktopSize } from '@/hooks/useDesktopSize';
 
+const WINDOW_IDS = [
+  'finder', 'terminal', 'vscode', 'safari', 'calculator', 'siri',
+  'photos', 'contacts', 'notes', 'bin', 'resume', 'music', 'mail', 'achievements',
+] as const;
+type WindowId = typeof WINDOW_IDS[number];
+
 function DesktopContent() {
-  const { showNotification } = useNotification();
-  const { setOpenAchievementsApp, unlockAchievement } = useAchievements();
+  const { showNotification } = useNotificationApi();
+  const { setOpenAchievementsApp, unlockAchievement } = useAchievementsApi();
   const windowContainerRef = useRef<HTMLDivElement>(null);
 
   // --- Boot & Mount State ---
@@ -53,6 +59,14 @@ function DesktopContent() {
   });
 
   const desktop = useDesktopSize(windowContainerRef);
+
+  // Latest windows state, exposed via ref so callbacks can stay stable across
+  // renders without capturing stale values. Without this, every open/close/focus
+  // would recreate every window callback and re-render every open app.
+  const windowsRef = useRef(windows);
+  useEffect(() => {
+    windowsRef.current = windows;
+  }, [windows]);
 
   useEffect(() => {
     const initTimer = setTimeout(() => setIsMounted(true), 1500);
@@ -135,43 +149,63 @@ function DesktopContent() {
     }, 800);
   };
 
-  const handleAppOpen = (id: string) => {
+  const handleAppOpen = useCallback((id: string) => {
     if (id === 'terminal') unlockAchievement('terminal_wizard');
     if (id === 'music') unlockAchievement('music_lover');
     if (id === 'mail' || id === 'resume') unlockAchievement('recruiter');
 
-    const currentOpenCount = Object.values(windows).filter(w => w.isOpen).length;
-    if (!windows[id as keyof typeof windows].isOpen && currentOpenCount >= 4) {
+    const w = windowsRef.current;
+    const currentOpenCount = Object.values(w).filter(x => x.isOpen).length;
+    if (!w[id as keyof typeof w].isOpen && currentOpenCount >= 4) {
       unlockAchievement('explorer');
     }
-  };
+  }, [unlockAchievement]);
 
-  const toggleApp = (id: string) => {
-    const app = windows[id as keyof typeof windows];
+  const toggleApp = useCallback((id: string) => {
+    const app = windowsRef.current[id as keyof typeof windowsRef.current];
     if (app.isOpen && !app.isMinimized) {
-      setWindows(prev => ({ ...prev, [id]: { ...app, isMinimized: true } }));
+      setWindows(prev => ({ ...prev, [id]: { ...prev[id as keyof typeof prev], isMinimized: true } }));
     } else {
-      setWindows(prev => ({ ...prev, [id]: { ...app, isOpen: true, isMinimized: false } }));
-      bringToFront(id);
+      setWindows(prev => {
+        const highestZ = Math.max(...Object.values(prev).map(w => w.z));
+        return { ...prev, [id]: { ...prev[id as keyof typeof prev], isOpen: true, isMinimized: false, z: highestZ + 1 } };
+      });
       handleAppOpen(id);
     }
-  };
+  }, [handleAppOpen]);
 
-  const openApp = (id: string) => {
-    const app = windows[id as keyof typeof windows];
-    if (app.isOpen) {
-      setWindows(prev => ({ ...prev, [id]: { ...app, isMinimized: false } }));
-      bringToFront(id);
-    } else {
-      setWindows(prev => ({ ...prev, [id]: { ...app, isOpen: true, isMinimized: false } }));
-      bringToFront(id);
-      handleAppOpen(id);
+  const openApp = useCallback((id: string) => {
+    const app = windowsRef.current[id as keyof typeof windowsRef.current];
+    const wasOpen = app.isOpen;
+    setWindows(prev => {
+      const highestZ = Math.max(...Object.values(prev).map(w => w.z));
+      return { ...prev, [id]: { ...prev[id as keyof typeof prev], isOpen: true, isMinimized: false, z: highestZ + 1 } };
+    });
+    if (!wasOpen) handleAppOpen(id);
+  }, [handleAppOpen]);
+
+  const closeApp = useCallback((id: string) => {
+    setWindows(prev => ({ ...prev, [id]: { ...prev[id as keyof typeof prev], isOpen: false } }));
+  }, []);
+
+  // Per-window callbacks memoized once, so every WindowLayout gets stable
+  // onClose / onMinimize / onFocus prop identities across renders.
+  const handlers = useMemo(() => {
+    const map = {} as Record<WindowId, { onClose: () => void; onMinimize: () => void; onFocus: () => void }>;
+    for (const id of WINDOW_IDS) {
+      map[id] = {
+        onClose: () => closeApp(id),
+        onMinimize: () => toggleApp(id),
+        onFocus: () => bringToFront(id),
+      };
     }
-  };
+    return map;
+  }, [closeApp, toggleApp, bringToFront]);
 
-  const closeApp = (id: string) => {
-    setWindows(prev => ({ ...prev, [id]: { ...prev[id as keyof typeof windows], isOpen: false } }));
-  };
+  const dockOpenApps = useMemo(
+    () => Object.fromEntries(Object.entries(windows).map(([k, v]) => [k, v.isOpen && !v.isMinimized])),
+    [windows],
+  );
 
   return (
     <main className="w-screen h-screen relative selection:bg-blue-500/30">
@@ -196,23 +230,23 @@ function DesktopContent() {
 
           <div ref={windowContainerRef} className="absolute top-9 left-0 w-full h-[calc(100%-2.25rem)]">
           <DesktopSizeProvider value={desktop}>
-            <WindowLayout id="notes" title="Notes" dockId="dock-icon-notes" isOpen={windows.notes.isOpen} isMinimized={windows.notes.isMinimized} onClose={() => closeApp('notes')} onMinimize={() => toggleApp('notes')} onFocus={() => bringToFront('notes')} zIndex={windows.notes.z} width={winSize.notes.width} height={winSize.notes.height} minWidth={320} minHeight={420} sidebar={true}><NotesApp onOpenApp={openApp} /></WindowLayout>
-            <WindowLayout id="siri" title="Siri" dockId="dock-icon-siri" isOpen={windows.siri.isOpen} isMinimized={windows.siri.isMinimized} onClose={() => closeApp('siri')} onMinimize={() => toggleApp('siri')} onFocus={() => bringToFront('siri')} zIndex={windows.siri.z} width={winSize.siri.width} height={winSize.siri.height} minWidth={340} minHeight={420}><SiriApp onOpenApp={openApp} /></WindowLayout>
-            <WindowLayout id="mail" title="Mail" dockId="dock-icon-mail" isOpen={windows.mail.isOpen} isMinimized={windows.mail.isMinimized} onClose={() => closeApp('mail')} onMinimize={() => toggleApp('mail')} onFocus={() => bringToFront('mail')} zIndex={windows.mail.z} width={winSize.mail.width} height={winSize.mail.height} minWidth={520} minHeight={400} sidebar={true}><MailApp /></WindowLayout>
-            <WindowLayout id="resume" title="Resume" dockId="dock-icon-resume" isOpen={windows.resume.isOpen} isMinimized={windows.resume.isMinimized} onClose={() => closeApp('resume')} onMinimize={() => toggleApp('resume')} onFocus={() => bringToFront('resume')} zIndex={windows.resume.z} width={winSize.resume.width} height={winSize.resume.height} minWidth={480} minHeight={420}><ResumeApp /></WindowLayout>
-            <WindowLayout id="vscode" title="VS Code" dockId="dock-icon-vscode" isOpen={windows.vscode.isOpen} isMinimized={windows.vscode.isMinimized} onClose={() => closeApp('vscode')} onMinimize={() => toggleApp('vscode')} onFocus={() => bringToFront('vscode')} zIndex={windows.vscode.z} width={winSize.vscode.width} height={winSize.vscode.height} minWidth={480} minHeight={400} sidebar={true}><VSCodeApp /></WindowLayout>
-            <WindowLayout id="finder" title="Finder" dockId="dock-icon-finder" isOpen={windows.finder.isOpen} isMinimized={windows.finder.isMinimized} onClose={() => closeApp('finder')} onMinimize={() => toggleApp('finder')} onFocus={() => bringToFront('finder')} zIndex={windows.finder.z} width={winSize.finder.width} height={winSize.finder.height} minWidth={480} minHeight={360} sidebar={true}><FinderApp /></WindowLayout>
-            <WindowLayout id="terminal" title="Terminal" dockId="dock-icon-terminal" isOpen={windows.terminal.isOpen} isMinimized={windows.terminal.isMinimized} onClose={() => closeApp('terminal')} onMinimize={() => toggleApp('terminal')} onFocus={() => bringToFront('terminal')} zIndex={windows.terminal.z} width={winSize.terminal.width} height={winSize.terminal.height} minWidth={380} minHeight={360}><TerminalApp bootMode={terminalBootMode} onBootComplete={handleTerminalBootComplete} /></WindowLayout>
-            <WindowLayout id="safari" title="Safari" dockId="dock-icon-safari" isOpen={windows.safari.isOpen} isMinimized={windows.safari.isMinimized} onClose={() => closeApp('safari')} onMinimize={() => toggleApp('safari')} onFocus={() => bringToFront('safari')} zIndex={windows.safari.z} width={winSize.safari.width} height={winSize.safari.height} minWidth={520} minHeight={420} sidebar={true}><SafariApp /></WindowLayout>
-            <WindowLayout id="calculator" title="Calculator" dockId="dock-icon-calculator" isOpen={windows.calculator.isOpen} isMinimized={windows.calculator.isMinimized} onClose={() => closeApp('calculator')} onMinimize={() => toggleApp('calculator')} onFocus={() => bringToFront('calculator')} zIndex={windows.calculator.z} width={winSize.calculator.width} height={winSize.calculator.height} minWidth={260} minHeight={420}><CalculatorApp /></WindowLayout>
-            <WindowLayout id="music" title="Music" dockId="dock-icon-music" isOpen={windows.music.isOpen} isMinimized={windows.music.isMinimized} onClose={() => closeApp('music')} onMinimize={() => toggleApp('music')} onFocus={() => bringToFront('music')} zIndex={windows.music.z} width={winSize.music.width} height={winSize.music.height} minWidth={520} minHeight={420}><MusicApp /></WindowLayout>
-            <WindowLayout id="photos" title="Photos" dockId="dock-icon-photos" isOpen={windows.photos.isOpen} isMinimized={windows.photos.isMinimized} onClose={() => closeApp('photos')} onMinimize={() => toggleApp('photos')} onFocus={() => bringToFront('photos')} zIndex={windows.photos.z} width={winSize.photos.width} height={winSize.photos.height} minWidth={520} minHeight={440}><PhotosApp /></WindowLayout>
-            <WindowLayout id="contacts" title="Contacts" dockId="dock-icon-contacts" isOpen={windows.contacts.isOpen} isMinimized={windows.contacts.isMinimized} onClose={() => closeApp('contacts')} onMinimize={() => toggleApp('contacts')} onFocus={() => bringToFront('contacts')} zIndex={windows.contacts.z} width={winSize.contacts.width} height={winSize.contacts.height} minWidth={560} minHeight={440}><ContactsApp /></WindowLayout>
-            <WindowLayout id="achievements" title="Achievements" dockId="dock-icon-achievements" isOpen={windows.achievements.isOpen} isMinimized={windows.achievements.isMinimized} onClose={() => closeApp('achievements')} onMinimize={() => toggleApp('achievements')} onFocus={() => bringToFront('achievements')} zIndex={windows.achievements.z} width={winSize.achievements.width} height={winSize.achievements.height} minWidth={420} minHeight={480}><AchievementsApp /></WindowLayout>
+            <WindowLayout id="notes" title="Notes" dockId="dock-icon-notes" isOpen={windows.notes.isOpen} isMinimized={windows.notes.isMinimized} onClose={handlers.notes.onClose} onMinimize={handlers.notes.onMinimize} onFocus={handlers.notes.onFocus} zIndex={windows.notes.z} width={winSize.notes.width} height={winSize.notes.height} minWidth={320} minHeight={420} sidebar={true}><NotesApp onOpenApp={openApp} /></WindowLayout>
+            <WindowLayout id="siri" title="Siri" dockId="dock-icon-siri" isOpen={windows.siri.isOpen} isMinimized={windows.siri.isMinimized} onClose={handlers.siri.onClose} onMinimize={handlers.siri.onMinimize} onFocus={handlers.siri.onFocus} zIndex={windows.siri.z} width={winSize.siri.width} height={winSize.siri.height} minWidth={340} minHeight={420}><SiriApp onOpenApp={openApp} /></WindowLayout>
+            <WindowLayout id="mail" title="Mail" dockId="dock-icon-mail" isOpen={windows.mail.isOpen} isMinimized={windows.mail.isMinimized} onClose={handlers.mail.onClose} onMinimize={handlers.mail.onMinimize} onFocus={handlers.mail.onFocus} zIndex={windows.mail.z} width={winSize.mail.width} height={winSize.mail.height} minWidth={520} minHeight={400} sidebar={true}><MailApp /></WindowLayout>
+            <WindowLayout id="resume" title="Resume" dockId="dock-icon-resume" isOpen={windows.resume.isOpen} isMinimized={windows.resume.isMinimized} onClose={handlers.resume.onClose} onMinimize={handlers.resume.onMinimize} onFocus={handlers.resume.onFocus} zIndex={windows.resume.z} width={winSize.resume.width} height={winSize.resume.height} minWidth={480} minHeight={420}><ResumeApp /></WindowLayout>
+            <WindowLayout id="vscode" title="VS Code" dockId="dock-icon-vscode" isOpen={windows.vscode.isOpen} isMinimized={windows.vscode.isMinimized} onClose={handlers.vscode.onClose} onMinimize={handlers.vscode.onMinimize} onFocus={handlers.vscode.onFocus} zIndex={windows.vscode.z} width={winSize.vscode.width} height={winSize.vscode.height} minWidth={480} minHeight={400} sidebar={true}><VSCodeApp /></WindowLayout>
+            <WindowLayout id="finder" title="Finder" dockId="dock-icon-finder" isOpen={windows.finder.isOpen} isMinimized={windows.finder.isMinimized} onClose={handlers.finder.onClose} onMinimize={handlers.finder.onMinimize} onFocus={handlers.finder.onFocus} zIndex={windows.finder.z} width={winSize.finder.width} height={winSize.finder.height} minWidth={480} minHeight={360} sidebar={true}><FinderApp /></WindowLayout>
+            <WindowLayout id="terminal" title="Terminal" dockId="dock-icon-terminal" isOpen={windows.terminal.isOpen} isMinimized={windows.terminal.isMinimized} onClose={handlers.terminal.onClose} onMinimize={handlers.terminal.onMinimize} onFocus={handlers.terminal.onFocus} zIndex={windows.terminal.z} width={winSize.terminal.width} height={winSize.terminal.height} minWidth={380} minHeight={360}><TerminalApp bootMode={terminalBootMode} onBootComplete={handleTerminalBootComplete} /></WindowLayout>
+            <WindowLayout id="safari" title="Safari" dockId="dock-icon-safari" isOpen={windows.safari.isOpen} isMinimized={windows.safari.isMinimized} onClose={handlers.safari.onClose} onMinimize={handlers.safari.onMinimize} onFocus={handlers.safari.onFocus} zIndex={windows.safari.z} width={winSize.safari.width} height={winSize.safari.height} minWidth={520} minHeight={420} sidebar={true}><SafariApp /></WindowLayout>
+            <WindowLayout id="calculator" title="Calculator" dockId="dock-icon-calculator" isOpen={windows.calculator.isOpen} isMinimized={windows.calculator.isMinimized} onClose={handlers.calculator.onClose} onMinimize={handlers.calculator.onMinimize} onFocus={handlers.calculator.onFocus} zIndex={windows.calculator.z} width={winSize.calculator.width} height={winSize.calculator.height} minWidth={260} minHeight={420}><CalculatorApp /></WindowLayout>
+            <WindowLayout id="music" title="Music" dockId="dock-icon-music" isOpen={windows.music.isOpen} isMinimized={windows.music.isMinimized} onClose={handlers.music.onClose} onMinimize={handlers.music.onMinimize} onFocus={handlers.music.onFocus} zIndex={windows.music.z} width={winSize.music.width} height={winSize.music.height} minWidth={520} minHeight={420}><MusicApp /></WindowLayout>
+            <WindowLayout id="photos" title="Photos" dockId="dock-icon-photos" isOpen={windows.photos.isOpen} isMinimized={windows.photos.isMinimized} onClose={handlers.photos.onClose} onMinimize={handlers.photos.onMinimize} onFocus={handlers.photos.onFocus} zIndex={windows.photos.z} width={winSize.photos.width} height={winSize.photos.height} minWidth={520} minHeight={440}><PhotosApp /></WindowLayout>
+            <WindowLayout id="contacts" title="Contacts" dockId="dock-icon-contacts" isOpen={windows.contacts.isOpen} isMinimized={windows.contacts.isMinimized} onClose={handlers.contacts.onClose} onMinimize={handlers.contacts.onMinimize} onFocus={handlers.contacts.onFocus} zIndex={windows.contacts.z} width={winSize.contacts.width} height={winSize.contacts.height} minWidth={560} minHeight={440}><ContactsApp /></WindowLayout>
+            <WindowLayout id="achievements" title="Achievements" dockId="dock-icon-achievements" isOpen={windows.achievements.isOpen} isMinimized={windows.achievements.isMinimized} onClose={handlers.achievements.onClose} onMinimize={handlers.achievements.onMinimize} onFocus={handlers.achievements.onFocus} zIndex={windows.achievements.z} width={winSize.achievements.width} height={winSize.achievements.height} minWidth={420} minHeight={480}><AchievementsApp /></WindowLayout>
           </DesktopSizeProvider>
           </div>
 
-          <DockLayout onOpenApp={toggleApp} openApps={Object.fromEntries(Object.entries(windows).map(([k, v]) => [k, v.isOpen && !v.isMinimized]))} />
+          <DockLayout onOpenApp={toggleApp} openApps={dockOpenApps} />
       </motion.div>
     </main>
   );

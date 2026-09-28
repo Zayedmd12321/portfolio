@@ -30,7 +30,7 @@ interface WindowLayoutProps {
   minHeight?: number;
 }
 
-export default function WindowLayout({
+function WindowLayoutInner({
   title, isOpen, isMinimized, onClose, onMinimize, onFocus, zIndex, children,
   width = 800, height = 600, sidebar = false, dockId, minWidth = 320, minHeight = 240
 }: WindowLayoutProps) {
@@ -58,10 +58,14 @@ export default function WindowLayout({
   const userMovedRef = useRef(false);
 
   // Recompute or clamp the rect whenever the available desktop changes.
+  // Skip entirely for closed & non-minimized windows: they won't be shown
+  // until reopened, and computeInitialRect will run again on the next open
+  // via the same effect anyway. Prevents 14 window re-renders on every
+  // viewport resize.
   useEffect(() => {
+    if (!isOpen && !isMinimized) return;
     setRect((prev) => {
       if (!userMovedRef.current) {
-        // Re-center with the *current* desired size until the user takes over.
         return computeInitialRect(desktop, {
           width,
           height,
@@ -74,7 +78,7 @@ export default function WindowLayout({
         minHeight: effMinHeight,
       });
     });
-  }, [desktop, width, height, effMinWidth, effMinHeight]);
+  }, [desktop, width, height, effMinWidth, effMinHeight, isOpen, isMinimized]);
 
   // Reset maximized state when window is minimized or closed.
   // React docs pattern for "adjusting state when a prop changes":
@@ -110,7 +114,10 @@ export default function WindowLayout({
     return { x: targetX - windowCenterX, y: targetY - windowBottomY };
   }, [rect, isOpen, isMinimized, dockId]);
 
-  const variants = {
+  // Memoized so framer-motion sees a stable variants object between renders
+  // when dockDelta hasn't changed — otherwise it treats each render as new
+  // animation config.
+  const variants = useMemo(() => ({
     initial: {
       opacity: 0,
       scale: 0,
@@ -155,7 +162,7 @@ export default function WindowLayout({
         ease: [0.68, -0.55, 0.265, 1.55] as [number, number, number, number]
       }
     }
-  };
+  }), [dockDelta]);
   const currentZIndex = isMaximized ? 100000 : zIndex;
 
   // Maximized windows fill the *desktop* area (viewport minus the MenuBar);
@@ -179,7 +186,16 @@ export default function WindowLayout({
           bounds={isMaximized ? undefined : 'parent'}
           dragHandleClassName="window-header"
           onMouseDown={onFocus}
-          style={{ zIndex: currentZIndex, position: 'absolute' }}
+          style={{
+            zIndex: currentZIndex,
+            position: 'absolute',
+            // While minimized or exiting, the Rnd wrapper is visually hidden
+            // (its inner motion.div scales to 0), but the wrapper itself still
+            // occupies its old rect and would swallow clicks meant for windows
+            // behind it. Disabling pointer events keeps stale windows from
+            // trapping the cursor.
+            pointerEvents: isOpen && !isMinimized ? 'auto' : 'none',
+          }}
           enableResizing={!isMaximized}
           disableDragging={isMaximized}
           onDragStop={(_e, d) => {
@@ -202,7 +218,19 @@ export default function WindowLayout({
               initial="initial"
               animate={!isMinimized ? "animate" : "minimized"}
               exit="exit"
-              style={{ transformOrigin: "bottom center" }}
+              // `contain: layout style` isolates the window's layout and
+              // style computation from the rest of the page, so reflows
+              // inside one window don't ripple out. We omit `paint` because
+              // it would clip the window's drop shadow. `will-change:
+              // transform` hints the browser to keep this element on its
+              // own compositor layer for framer-motion animations. (We
+              // deliberately don't set `transform` here — framer-motion
+              // already drives it via the variants above.)
+              style={{
+                transformOrigin: "bottom center",
+                contain: 'layout style',
+                willChange: 'transform',
+              }}
               className={`w-full h-full overflow-hidden flex flex-col shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] bg-[#1e1e1e] ${isMaximized ? 'rounded-none border-none' : 'rounded-xl border border-white/10'}`}
             >
               {/* Header */}
@@ -243,3 +271,9 @@ export default function WindowLayout({
     </AnimatePresence>
   );
 }
+
+// Memoized so opening/focusing one window doesn't force every other open
+// window (and its heavy Rnd + framer-motion tree) to re-render. Relies on
+// the parent passing stable callback identities.
+const WindowLayout = React.memo(WindowLayoutInner);
+export default WindowLayout;

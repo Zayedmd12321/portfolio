@@ -7,7 +7,7 @@ interface ActionButtonProps {
   label: string;
 }
 
-export default function ActionButton({ icon: Icon, label }: ActionButtonProps) {
+function ActionButton({ icon: Icon, label }: ActionButtonProps) {
   return (
     <div className="flex flex-col items-center gap-1.5 group cursor-pointer">
       <div className="w-11 h-11 rounded-full bg-gray-50 dark:bg-[#2a2a2a] flex items-center justify-center text-[#007AFF] shadow-sm group-hover:scale-105 group-hover:bg-[#007AFF] group-hover:text-white transition-all duration-300 border border-black/5 dark:border-white/5">
@@ -17,3 +17,5 @@ export default function ActionButton({ icon: Icon, label }: ActionButtonProps) {
     </div>
   );
 }
+
+export default React.memo(ActionButton);

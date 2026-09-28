@@ -1,6 +1,6 @@
 'use client';
-import React, { useRef } from 'react';
-import { motion, useSpring, useTransform, MotionValue } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, MotionValue } from 'framer-motion';
 
 const BASE_WIDTH = 65;
 const MAX_WIDTH = 110;
@@ -15,7 +15,7 @@ interface DockIconProps {
   onClick: () => void;
 }
 
-export function DockIcon({
+function DockIconInner({
   id,
   mouseX,
   src,
@@ -25,11 +25,31 @@ export function DockIcon({
 }: DockIconProps) {
   const ref = useRef<HTMLButtonElement>(null);
 
-  const distance = useTransform(mouseX, (val) => {
-    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-    const iconCenter = bounds.x + bounds.width / 2;
-    return val - iconCenter;
-  });
+  // Cache the icon's centerX in a MotionValue and refresh it only when the
+  // element resizes (or on window resize). Previously the distance transform
+  // called getBoundingClientRect() on every mousemove for every icon, which
+  // forced synchronous layout N times per frame — the main cause of dock lag.
+  const centerX = useMotionValue(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      centerX.set(r.x + r.width / 2);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, { passive: true });
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure);
+    };
+  }, [centerX]);
+
+  const distance = useTransform(() => mouseX.get() - centerX.get());
 
   const widthSync = useTransform(
     distance,
@@ -80,3 +100,8 @@ export function DockIcon({
     </div>
   );
 }
+
+// Memoized so an unrelated re-render of DockLayout (e.g. openApps prop
+// referentially changes) doesn't force every icon to re-mount its
+// framer-motion setup.
+export const DockIcon = React.memo(DockIconInner);

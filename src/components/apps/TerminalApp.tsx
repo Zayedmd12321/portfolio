@@ -126,7 +126,10 @@ export default function TerminalApp({ bootMode = false, onBootComplete }: Termin
   };
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // 'auto' avoids the smooth-scroll animation the browser otherwise runs
+    // for every appended line during the ~30-line boot sequence, which
+    // stacked into a visible stutter behind the window.
+    bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
   }, [history]);
 
   // Helper to colorize log lines based on content

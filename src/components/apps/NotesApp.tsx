@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Trash2, SquarePen, AlertCircle, X, Briefcase, Mail, Github, Linkedin, 
@@ -7,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Note, initialNotes } from '@/data/notes.data';
 import { profileData, skills, experiences, projects, type Skill, type Projects } from '@/data/portfolio.data';
 
-export default function NotesApp({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
+function NotesAppInner({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [activeNoteId, setActiveNoteId] = useState<string | null>('about');
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,25 +214,39 @@ export default function NotesApp({ onOpenApp }: { onOpenApp?: (id: string) => vo
   );
 }
 
+const NotesApp = React.memo(NotesAppInner);
+export default NotesApp;
+
 // --- PORTFOLIO COMPONENTS ---
+
+type SplitMode = 'small' | 'medium' | 'large';
+function widthToMode(w: number): SplitMode {
+  if (w > 1200) return 'large';
+  if (w > 700) return 'medium';
+  return 'small';
+}
 
 function PortfolioSplitView() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
+  // Track the layout MODE (small/medium/large), not the raw width. Setting
+  // width state on every ResizeObserver tick during a window drag re-rendered
+  // the whole portfolio tree per frame; the layout only actually changes at
+  // two breakpoints, so we setState at most twice per resize.
+  const [mode, setMode] = useState<SplitMode>('large');
 
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        setWidth(entry.contentRect.width);
+        const next = widthToMode(entry.contentRect.width);
+        setMode(prev => (prev === next ? prev : next));
       }
     });
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
 
-  // 1. Large Screens (> 1200px): 3-Column Layout
-  if (width > 1200) {
+  if (mode === 'large') {
     return (
       <div ref={containerRef} className="flex w-full h-full divide-x divide-white/5 bg-[#1c1c1c]">
         {/* Profile: 28% */}
@@ -250,8 +265,7 @@ function PortfolioSplitView() {
     );
   } 
   
-  // 2. Medium Screens (700px - 1200px): 2-Column Layout
-  else if (width > 700) {
+  else if (mode === 'medium') {
     return (
       <div ref={containerRef} className="flex w-full h-full divide-x divide-white/5 bg-[#1c1c1c]">
         <div className="w-[42%] min-w-95 shrink-0 h-full pb-8 pr-8 pl-8 flex flex-col justify-center text-center bg-[#1e1e1e]/30 overflow-y-auto macos-scrollbar">

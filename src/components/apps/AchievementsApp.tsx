@@ -1,13 +1,13 @@
 'use client';
 import React, { useState } from 'react';
 import { Trophy, Lock, Layers, Zap, Grid, Eye, type LucideIcon } from 'lucide-react';
-import { useAchievements } from '@/context/AchievementsContext';
+import { useAchievementsState } from '@/context/AchievementsContext';
 import { ACHIEVEMENTS, AchievementCategory } from '@/data/achievements.data';
 
 type FilterType = 'all' | AchievementCategory;
 
 export default function AchievementsApp() {
-  const { unlockedIds, totalXP, level } = useAchievements();
+  const { unlockedIds, totalXP, level } = useAchievementsState();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   const xpForNextLevel = level * 200;

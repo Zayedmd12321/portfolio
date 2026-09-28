@@ -59,22 +59,24 @@ export default function MenuBarLayout() {
   const controlCenterRef = useRef<HTMLDivElement>(null);
   const { changeWallpaper } = useOS();
 
+  // Read latest activeMenu via ref so we can attach the mousedown listener
+  // once instead of re-binding it every time a menu opens/closes.
+  const activeMenuRef = useRef(activeMenu);
+  useEffect(() => { activeMenuRef.current = activeMenu; }, [activeMenu]);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      const cur = activeMenuRef.current;
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        if (activeMenu !== 'control-center') {
-            setActiveMenu(null);
-        }
+        if (cur !== 'control-center') setActiveMenu(null);
       }
       if (controlCenterRef.current && !controlCenterRef.current.contains(event.target as Node)) {
-         if (activeMenu === 'control-center') {
-            setActiveMenu(null);
-         }
+        if (cur === 'control-center') setActiveMenu(null);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [activeMenu]);
+  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -174,11 +176,14 @@ export default function MenuBarLayout() {
                                             onClick={() => changeWallpaper(wp.path)}
                                             className="aspect-square rounded-lg overflow-hidden border border-white/10 hover:border-blue-500 hover:scale-110 transition-all shadow-sm cursor-pointer"
                                         >
-                                            {/* Local wallpaper thumbnails inside a tiny 32px picker. */}
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
-                                                src={wp.path}
+                                                src={wp.thumb}
                                                 alt={wp.alt}
+                                                width={64}
+                                                height={64}
+                                                loading="lazy"
+                                                decoding="async"
                                                 className="w-full h-full object-cover"
                                             />
                                         </button>

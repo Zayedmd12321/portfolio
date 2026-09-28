@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useEffect, useSyncExternalStore } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 
 interface OSContextType {
   wallpaper: string;
@@ -40,17 +40,19 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     getWallpaperServerSnapshot,
   );
 
-  const changeWallpaper = (url: string) => {
+  const changeWallpaper = useCallback((url: string) => {
     localStorage.setItem(WALLPAPER_KEY, url);
     wallpaperListeners.forEach(listener => listener());
-  };
+  }, []);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--wallpaper', `url(${wallpaper})`);
   }, [wallpaper]);
 
+  const value = useMemo(() => ({ wallpaper, changeWallpaper }), [wallpaper, changeWallpaper]);
+
   return (
-    <OSContext.Provider value={{ wallpaper, changeWallpaper }}>
+    <OSContext.Provider value={value}>
       {children}
     </OSContext.Provider>
   );

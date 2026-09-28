@@ -10,13 +10,13 @@ interface SidebarItemProps {
   onClick: () => void;
 }
 
-export default function SidebarItem({ label, icon: Icon, count, active, onClick }: SidebarItemProps) {
+function SidebarItem({ label, icon: Icon, count, active, onClick }: SidebarItemProps) {
   return (
-    <button 
+    <button
       onClick={onClick}
       className={`px-4 py-1.5 mx-2 rounded-md flex justify-between items-center transition-colors w-auto ${
-        active 
-          ? 'bg-[#007AFF] text-white shadow-sm' 
+        active
+          ? 'bg-[#007AFF] text-white shadow-sm'
           : 'text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5'
     }`}>
        <div className="flex items-center gap-2">
@@ -27,3 +27,5 @@ export default function SidebarItem({ label, icon: Icon, count, active, onClick 
     </button>
   );
 }
+
+export default React.memo(SidebarItem);

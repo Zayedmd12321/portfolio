@@ -6,7 +6,7 @@ interface InfoBoxProps {
   value: string;
 }
 
-export default function InfoBox({ label, value }: InfoBoxProps) {
+function InfoBox({ label, value }: InfoBoxProps) {
   return (
     <div className="bg-white dark:bg-[#2a2a2a] p-4 rounded-xl border border-black/5 dark:border-white/5 shadow-sm">
       <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wide block mb-1">{label}</span>
@@ -14,3 +14,5 @@ export default function InfoBox({ label, value }: InfoBoxProps) {
     </div>
   );
 }
+
+export default React.memo(InfoBox);

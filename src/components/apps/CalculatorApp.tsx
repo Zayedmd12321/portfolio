@@ -136,8 +136,22 @@ export default function CalculatorApp() {
     latestHandlers.current = { inputDigit, inputDot, performOperation, clear, display };
   });
 
+  const rootRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only respond to keys when the Calculator itself has focus, or when
+      // the user isn't typing anywhere else. Prevents typing in Notes/Mail
+      // from silently pushing digits into the calculator.
+      const target = event.target as HTMLElement | null;
+      const inCalc = rootRef.current?.contains(target ?? null);
+      const editable =
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable);
+      if (!inCalc && editable) return;
+      if (!inCalc && target && target !== document.body) return;
+
       const { key } = event;
       const { inputDigit, inputDot, performOperation, clear, display } = latestHandlers.current;
 
@@ -156,7 +170,7 @@ export default function CalculatorApp() {
   }, []);
 
   return (
-    <div className="w-full h-full bg-black text-white p-4 flex flex-col justify-end select-none font-sans cursor-default">
+    <div ref={rootRef} tabIndex={-1} className="w-full h-full bg-black text-white p-4 flex flex-col justify-end select-none font-sans cursor-default outline-none">
       
       {/* Display Area */}
       <div className={`w-full text-right px-2 pb-2 mb-1 font-light tracking-tight leading-none truncate transition-all duration-100 ${getDisplayFontSize(display)}`}>

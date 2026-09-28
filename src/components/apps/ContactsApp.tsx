@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   Phone, Mail, MessageSquare, Search, 
   CheckCircle2, User, Layers, Zap, ThumbsUp, Clock
@@ -15,16 +15,28 @@ export default function ContactsApp() {
   const [activeCategory, setActiveCategory] = useState<Category>('all');
   const [search, setSearch] = useState('');
 
-  // Filter Logic (Category + Search)
-  const filteredContacts = CONTACTS.filter(c => {
-    const matchesSearch = (c.firstName + ' ' + c.lastName).toLowerCase().includes(search.toLowerCase()) ||
-                          c.company.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = activeCategory === 'all' || c.type === activeCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  // One pass over CONTACTS instead of six (four sidebar counts + filtered
+  // list + selected lookup) — sidebar keystrokes now do O(n) work, not O(6n).
+  const { filteredContacts, counts } = useMemo(() => {
+    const q = search.toLowerCase();
+    const counts = { action: 0, skill: 0, soft: 0, logistics: 0 };
+    const filtered = [] as typeof CONTACTS;
+    for (const c of CONTACTS) {
+      if (c.type in counts) counts[c.type as keyof typeof counts]++;
+      const matchesSearch =
+        !q ||
+        (c.firstName + ' ' + c.lastName).toLowerCase().includes(q) ||
+        c.company.toLowerCase().includes(q);
+      const matchesCategory = activeCategory === 'all' || c.type === activeCategory;
+      if (matchesSearch && matchesCategory) filtered.push(c);
+    }
+    return { filteredContacts: filtered, counts };
+  }, [search, activeCategory]);
 
-  const selectedContact = CONTACTS.find(c => c.id === selectedContactId) || CONTACTS[0];
+  const selectedContact = useMemo(
+    () => CONTACTS.find(c => c.id === selectedContactId) || CONTACTS[0],
+    [selectedContactId],
+  );
 
   return (
     <div className="flex h-full w-full bg-white dark:bg-[#1e1e1e] text-black dark:text-white font-sans overflow-hidden rounded-b-xl">
@@ -45,28 +57,28 @@ export default function ContactsApp() {
         <SidebarItem 
           label="Action Items" 
           icon={User}
-          count={CONTACTS.filter(c => c.type === 'action').length} 
+          count={counts.action}
           active={activeCategory === 'action'} 
           onClick={() => setActiveCategory('action')} 
         />
         <SidebarItem 
           label="Hard Skills" 
           icon={Zap}
-          count={CONTACTS.filter(c => c.type === 'skill').length} 
+          count={counts.skill}
           active={activeCategory === 'skill'} 
           onClick={() => setActiveCategory('skill')} 
         />
         <SidebarItem 
           label="Soft Skills" 
           icon={ThumbsUp}
-          count={CONTACTS.filter(c => c.type === 'soft').length} 
+          count={counts.soft}
           active={activeCategory === 'soft'} 
           onClick={() => setActiveCategory('soft')} 
         />
         <SidebarItem 
           label="Logistics" 
           icon={Clock}
-          count={CONTACTS.filter(c => c.type === 'logistics').length} 
+          count={counts.logistics}
           active={activeCategory === 'logistics'} 
           onClick={() => setActiveCategory('logistics')} 
         />

@@ -59,14 +59,12 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll logic
+  // Auto-scroll logic. Reads scrollHeight (a layout query) once, jumps
+  // instantly instead of firing a smooth-scroll animation for every message
+  // — the message-in animation itself already carries the visual motion.
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [history, isLoading]);
 
   const handleSend = async (textOverride?: string) => {
@@ -120,17 +118,23 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
   return (
     <div className="flex flex-col h-full w-full bg-[#121212]/90 backdrop-blur-3xl font-sans overflow-hidden relative shadow-2xl border border-white/10 rounded-xl">
       
-      {/* --- Apple Intelligence Ambient Glow --- */}
+      {/* --- Apple Intelligence Ambient Glow ---
+          Only opacity animates; scaling a `blur-[100px]` element forces a
+          full re-blur every frame (~megapixels of Gaussian per glow), while
+          opacity changes are compositor-only. Blur reduced from 100px→60px
+          for the same visual softness at a fraction of the fill-rate cost. */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-         <motion.div 
-            animate={{ opacity: [0.3, 0.5, 0.3], scale: [1, 1.1, 1] }}
+         <motion.div
+            animate={{ opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 8, repeat: Infinity }}
-            className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/30 rounded-full blur-[100px]" 
+            style={{ willChange: 'opacity' }}
+            className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/30 rounded-full blur-[60px]"
          />
-         <motion.div 
-            animate={{ opacity: [0.3, 0.5, 0.3], scale: [1, 1.2, 1] }}
+         <motion.div
+            animate={{ opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 10, repeat: Infinity, delay: 1 }}
-            className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/30 rounded-full blur-[100px]" 
+            style={{ willChange: 'opacity' }}
+            className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-600/30 rounded-full blur-[60px]"
          />
       </div>
 

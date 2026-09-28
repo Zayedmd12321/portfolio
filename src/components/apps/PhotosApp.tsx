@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { Image as ImageIcon, Grid3x3, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,36 +10,27 @@ interface Photo {
   category: string;
 }
 
-export default function PhotosApp() {
+// Hoisted out of the component so the array is built once at module load,
+// not on every render (16 objects were being allocated per re-render).
+const SKILL_ICONS = [
+  'aws_dark.svg', 'aws_light.svg', 'docker.svg', 'fastapi.svg', 'figma.svg',
+  'firebase.svg', 'git.svg', 'mongodb-icon-dark.svg', 'nextjs_icon_dark.svg',
+  'nodejs.svg', 'postgresql.svg', 'react_dark.svg', 'react_light.svg',
+  'supabase.svg', 'tailwindcss.svg', 'typescript.svg',
+];
+
+const PHOTOS: Photo[] = SKILL_ICONS.map((icon, idx) => ({
+  id: idx + 1,
+  src: `/skills/${icon}`,
+  title: icon.replace(/\.(svg|png)$/, '').replace(/_/g, ' ').toUpperCase(),
+  category: 'Tech Stack',
+}));
+
+function PhotosAppInner() {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Generate photos from skills folder
-  const skillIcons = [
-    'aws_dark.svg',
-    'aws_light.svg',
-    'docker.svg',
-    'fastapi.svg',
-    'figma.svg',
-    'firebase.svg',
-    'git.svg',
-    'mongodb-icon-dark.svg',
-    'nextjs_icon_dark.svg',
-    'nodejs.svg',
-    'postgresql.svg',
-    'react_dark.svg',
-    'react_light.svg',
-    'supabase.svg',
-    'tailwindcss.svg',
-    'typescript.svg'
-  ];
-
-  const photos: Photo[] = skillIcons.map((icon, idx) => ({
-    id: idx + 1,
-    src: `/skills/${icon}`,
-    title: icon.replace(/\.(svg|png)$/, '').replace(/_/g, ' ').toUpperCase(),
-    category: 'Tech Stack'
-  }));
+  const photos = PHOTOS;
 
   const handlePhotoClick = (photo: Photo) => {
     setSelectedPhoto(photo);
@@ -186,3 +178,6 @@ export default function PhotosApp() {
     </div>
   );
 }
+
+const PhotosApp = React.memo(PhotosAppInner);
+export default PhotosApp;

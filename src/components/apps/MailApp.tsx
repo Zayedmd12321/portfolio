@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { Send, PenSquare, Inbox, CheckCircle2, Github, Linkedin, Mail, User, type LucideIcon } from 'lucide-react';
-import { useNotification } from '@/context/NotificationContext';
+import { useNotificationApi } from '@/context/NotificationContext';
 
 type Section = 'compose' | 'testimonials' | 'success';
 
@@ -10,7 +10,7 @@ interface MailAppProps {
 }
 
 export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
-  const { showNotification } = useNotification();
+  const { showNotification } = useNotificationApi();
   const [activeSection, setActiveSection] = useState<Section>(initialSection);
   const [sending, setSending] = useState(false);
   
@@ -195,7 +195,7 @@ interface SidebarItemProps {
   onClick: () => void;
 }
 
-function SidebarItem({ icon: Icon, label, count, isActive, onClick }: SidebarItemProps) {
+const SidebarItem = React.memo(function SidebarItem({ icon: Icon, label, count, isActive, onClick }: SidebarItemProps) {
   return (
     <button
       onClick={onClick}
@@ -212,7 +212,7 @@ function SidebarItem({ icon: Icon, label, count, isActive, onClick }: SidebarIte
        )}
     </button>
   );
-}
+});
 
 interface ContactCardProps {
   icon: LucideIcon;
@@ -221,7 +221,7 @@ interface ContactCardProps {
   href?: string;
 }
 
-function ContactCard({ icon: Icon, label, value, href }: ContactCardProps) {
+const ContactCard = React.memo(function ContactCard({ icon: Icon, label, value, href }: ContactCardProps) {
    return (
       <a href={href} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all group cursor-pointer">
          <div className="w-10 h-10 rounded-lg bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -232,5 +232,5 @@ function ContactCard({ icon: Icon, label, value, href }: ContactCardProps) {
             <div className="text-sm text-white font-medium">{value}</div>
          </div>
       </a>
-   )
-}
+   );
+});
