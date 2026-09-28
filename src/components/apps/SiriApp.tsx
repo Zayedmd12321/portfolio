@@ -189,7 +189,7 @@ export default function SiriApp({ onOpenApp }: SiriAppProps = {}) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-[85%] px-5 py-3.5 text-[14px] leading-relaxed shadow-sm backdrop-blur-xl ${
+              <div className={`max-w-[85%] px-5 py-3.5 text-[0.875rem] leading-relaxed shadow-sm backdrop-blur-xl ${
                 msg.role === 'user' 
                   ? 'bg-[#007AFF] text-white rounded-2xl rounded-br-sm' 
                   : 'bg-[#333]/70 text-gray-100 rounded-2xl rounded-bl-sm border border-white/10'

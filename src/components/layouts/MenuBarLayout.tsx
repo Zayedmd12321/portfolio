@@ -91,7 +91,7 @@ export default function MenuBarLayout() {
   }, []);
 
   return (
-    <div className="fixed top-0 w-full h-9 z-9999 bg-black/20 backdrop-blur-xl border-b border-white/5 text-white shadow-sm select-none flex justify-between px-2 sm:px-4 items-center font-medium text-[13px]">
+    <div className="fixed top-0 w-full h-9 z-9999 bg-black/20 backdrop-blur-xl border-b border-white/5 text-white shadow-sm select-none flex justify-between px-2 sm:px-4 items-center font-medium text-[0.8125rem]">
       
       {/* Left Side */}
       <div className="flex items-center gap-1 sm:gap-4 h-full relative" ref={menuRef}>
@@ -196,7 +196,7 @@ export default function MenuBarLayout() {
             </div>
         </div>
 
-        <span className="text-[13px] font-medium min-w-32.5 text-right tabular-nums tracking-wide">
+        <span className="text-[0.8125rem] font-medium min-w-32.5 text-right tabular-nums tracking-wide">
             {time}
         </span>
       </div>

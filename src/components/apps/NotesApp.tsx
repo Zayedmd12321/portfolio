@@ -106,7 +106,7 @@ function NotesAppInner({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
                     <input
                       type="text" placeholder="Search" value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-[#1c1c1c] rounded-md py-1 pl-8 pr-3 text-[13px] text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#dcae48]/50 placeholder:text-gray-500 border border-white/5 shadow-inner transition-all"
+                      className="w-full bg-[#1c1c1c] rounded-md py-1 pl-8 pr-3 text-[0.8125rem] text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#dcae48]/50 placeholder:text-gray-500 border border-white/5 shadow-inner transition-all"
                     />
                   </div>
                   <button onClick={createNote} className="p-1.5 text-gray-400 hover:text-[#dcae48] hover:bg-white/5 rounded-md transition-all cursor-pointer" title="Create New Note">
@@ -115,7 +115,7 @@ function NotesAppInner({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-y-auto px-2 space-y-0.5 macos-scrollbar">
-                  <div className="text-[10px] font-bold text-gray-500/60 px-3 mb-1 mt-2 tracking-wider">ICLOUD</div>
+                  <div className="text-[0.625rem] font-bold text-gray-500/60 px-3 mb-1 mt-2 tracking-wider">ICLOUD</div>
                   {filteredNotes.map((note) => (
                     <div 
                       key={note.id} onClick={() => setActiveNoteId(note.id)}
@@ -125,10 +125,10 @@ function NotesAppInner({ onOpenApp }: { onOpenApp?: (id: string) => void }) {
                       `}
                     >
                       <div className="flex justify-between items-baseline mb-0.5">
-                        <span className={`text-[14px] font-bold truncate ${activeNoteId === note.id ? 'text-black/90' : 'text-gray-100 group-hover:text-white'}`}>{note.title}</span>
-                        <span className={`text-[12px] ${activeNoteId === note.id ? 'text-black/70' : 'text-gray-500 group-hover:text-gray-400'}`}>{note.date}</span>
+                        <span className={`text-[0.875rem] font-bold truncate ${activeNoteId === note.id ? 'text-black/90' : 'text-gray-100 group-hover:text-white'}`}>{note.title}</span>
+                        <span className={`text-[0.75rem] ${activeNoteId === note.id ? 'text-black/70' : 'text-gray-500 group-hover:text-gray-400'}`}>{note.date}</span>
                       </div>
-                      <div className={`text-[13px] truncate leading-tight ${activeNoteId === note.id ? 'text-black/80 font-medium' : 'text-gray-500 group-hover:text-gray-400'}`}>{note.preview}</div>
+                      <div className={`text-[0.8125rem] truncate leading-tight ${activeNoteId === note.id ? 'text-black/80 font-medium' : 'text-gray-500 group-hover:text-gray-400'}`}>{note.preview}</div>
                       
                       <button 
                         onClick={(e) => deleteNoteById(e, note.id)}
@@ -254,7 +254,7 @@ function PortfolioSplitView() {
            <ProfileSection centered={true} />
         </div>
         {/* Experience: Flexible Middle */}
-        <div className="flex-1 min-w-[320px] h-full overflow-y-auto macos-scrollbar pb-8 pr-8 pl-8">
+        <div className="flex-1 min-w-[20rem] h-full overflow-y-auto macos-scrollbar pb-8 pr-8 pl-8">
            <ExperienceSection />
         </div>
         {/* Tech: 38% */}
@@ -321,7 +321,7 @@ function ProfileSection({ centered }: { centered?: boolean }) {
           return (
             <div
               key={idx}
-              className="flex items-center gap-2 text-[11px] font-medium text-gray-200 bg-white/5 py-1.5 px-3 rounded-full border border-white/5 shadow-sm max-w-full"
+              className="flex items-center gap-2 text-[0.6875rem] font-medium text-gray-200 bg-white/5 py-1.5 px-3 rounded-full border border-white/5 shadow-sm max-w-full"
             >
               <Briefcase size={11} className="text-[#dcae48] shrink-0" strokeWidth={2.25} />
               <span className="whitespace-nowrap truncate">{label}</span>
@@ -397,18 +397,18 @@ function ExperienceSection() {
                     </div>
                   )}
                   <div className="flex flex-col min-w-0">
-                    <h3 className="text-[16px] font-bold text-white leading-tight group-hover:text-[#dcae48] transition-colors">
+                    <h3 className="text-[1rem] font-bold text-white leading-tight group-hover:text-[#dcae48] transition-colors">
                       {exp.title}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[13px] text-gray-400 font-medium truncate">{exp.company}</span>
+                      <span className="text-[0.8125rem] text-gray-400 font-medium truncate">{exp.company}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Date & Badge */}
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[11px] text-gray-500 font-mono bg-black/20 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">
+                  <span className="text-[0.6875rem] text-gray-500 font-mono bg-black/20 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">
                     {exp.status}
                   </span>
                   {/* Clean static dot for Present status instead of ping */}
@@ -419,7 +419,7 @@ function ExperienceSection() {
               </div>
 
               {/* Description */}
-              <p className="text-[13px] text-gray-300 leading-relaxed font-light mb-4 border-l-2 border-white/5 pl-3 group-hover:border-[#dcae48]/50 transition-colors">
+              <p className="text-[0.8125rem] text-gray-300 leading-relaxed font-light mb-4 border-l-2 border-white/5 pl-3 group-hover:border-[#dcae48]/50 transition-colors">
                 {exp.description}
               </p>
 
@@ -451,7 +451,7 @@ function ExperienceSection() {
                   return (
                     <span 
                       key={techIdx} 
-                      className="flex items-center gap-1.5 text-[10px] text-gray-400 bg-white/5 px-2.5 py-1 rounded-sm border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 text-[0.625rem] text-gray-400 bg-white/5 px-2.5 py-1 rounded-sm border border-transparent hover:border-white/10 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                     >
                       {techIcon && (
                         /* Local skill icon. Kept as <img> so the tiny 12px
@@ -501,8 +501,8 @@ function TechCard({ name, desc, file }: Skill) {
       </div>
 
       <div className="min-w-0 flex flex-col justify-center">
-        <div className="text-[15px] font-bold text-gray-100 leading-tight mb-0.5 group-hover:text-white transition-colors">{name}</div>
-        <div className="text-[12px] text-gray-500 font-medium truncate group-hover:text-gray-400 transition-colors">{desc}</div>
+        <div className="text-[0.9375rem] font-bold text-gray-100 leading-tight mb-0.5 group-hover:text-white transition-colors">{name}</div>
+        <div className="text-[0.75rem] text-gray-500 font-medium truncate group-hover:text-gray-400 transition-colors">{desc}</div>
       </div>
     </div>
   );

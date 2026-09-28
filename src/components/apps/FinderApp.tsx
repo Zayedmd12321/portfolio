@@ -8,13 +8,13 @@ export default function FinderApp() {
   return (
     <div className="flex h-full w-full">
       {/* Sidebar (Glass) */}
-      <div className="w-48 macos-glass p-3 flex flex-col gap-1 text-[13px] text-gray-300 font-medium pt-4 border-r border-white/10">
-        <span className="text-[11px] text-gray-500 font-semibold mb-1 px-2 uppercase tracking-wider">Favorites</span>
+      <div className="w-48 macos-glass p-3 flex flex-col gap-1 text-[0.8125rem] text-gray-300 font-medium pt-4 border-r border-white/10">
+        <span className="text-[0.6875rem] text-gray-500 font-semibold mb-1 px-2 uppercase tracking-wider">Favorites</span>
         {finderSidebarFavorites.map((item, idx) => (
           <SidebarItem key={idx} icon={item.icon} label={item.label} />
         ))}
         
-        <span className="text-[11px] text-gray-500 font-semibold mb-1 px-2 mt-4 uppercase tracking-wider">iCloud</span>
+        <span className="text-[0.6875rem] text-gray-500 font-semibold mb-1 px-2 mt-4 uppercase tracking-wider">iCloud</span>
         {finderSidebarCloud.map((item, idx) => (
           <SidebarItem key={idx} icon={item.icon} label={item.label} />
         ))}

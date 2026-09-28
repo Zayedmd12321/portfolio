@@ -25,7 +25,7 @@ export default function VSCodeApp() {
         <div className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-400">Explorer</div>
         <div className="px-2">
           <div className="flex items-center gap-1 py-1 bg-[#37373d] text-white cursor-pointer">
-            <span className="rotate-90 text-[10px]">▶</span>
+            <span className="rotate-90 text-[0.625rem]">▶</span>
             <span className="font-bold">ZAYED-PORTFOLIO</span>
           </div>
           <div className="pl-4 py-1 text-[#569cd6] cursor-pointer">src</div>

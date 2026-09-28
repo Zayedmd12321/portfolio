@@ -279,7 +279,7 @@ export default function SafariApp() {
                 className="group flex items-center gap-3 p-2 hover:bg-white rounded-lg cursor-pointer transition-colors" 
                 onClick={() => handleBookmarkClick(b.url)}
               >
-                 <div className={`w-6 h-6 rounded flex items-center justify-center text-[10px] text-white ${b.color}`}>
+                 <div className={`w-6 h-6 rounded flex items-center justify-center text-[0.625rem] text-white ${b.color}`}>
                     {b.name.slice(0,1).toUpperCase()}
                  </div>
                  <span className="text-sm text-gray-700 truncate flex-1">{b.name}</span>

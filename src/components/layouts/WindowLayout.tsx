@@ -252,7 +252,7 @@ function WindowLayoutInner({
                   </button>
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-white/40 text-[13px] font-medium tracking-wide shadow-sm">{sidebar ? '' : title}</span>
+                  <span className="text-white/40 text-[0.8125rem] font-medium tracking-wide shadow-sm">{sidebar ? '' : title}</span>
                 </div>
               </div>
 

@@ -103,7 +103,7 @@ export const experiences: Experience[] = [
     logoBg: "bg-white",
     logoText: {
       text: "RF",
-      className: "text-blue-600 font-bold tracking-tight text-[15px] leading-none",
+      className: "text-blue-600 font-bold tracking-tight text-[0.9375rem] leading-none",
     }
   },
   {

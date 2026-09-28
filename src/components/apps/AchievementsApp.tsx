@@ -73,7 +73,7 @@ export default function AchievementsApp() {
                            <p className="text-xs text-gray-500 dark:text-gray-400 leading-snug mt-1 line-clamp-2">{achievement.description}</p>
                         </div>
                         <div className="flex flex-col items-end shrink-0">
-                           <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${isUnlocked ? 'bg-yellow-400/20 text-yellow-600 dark:text-yellow-400' : 'bg-gray-200 dark:bg-black/20 text-gray-400'}`}>{achievement.xp} XP</span>
+                           <span className={`text-[0.625rem] font-bold px-2 py-1 rounded-full ${isUnlocked ? 'bg-yellow-400/20 text-yellow-600 dark:text-yellow-400' : 'bg-gray-200 dark:bg-black/20 text-gray-400'}`}>{achievement.xp} XP</span>
                         </div>
                      </div>
                   </div>

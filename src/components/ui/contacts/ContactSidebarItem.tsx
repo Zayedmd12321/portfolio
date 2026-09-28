@@ -21,9 +21,9 @@ function SidebarItem({ label, icon: Icon, count, active, onClick }: SidebarItemP
     }`}>
        <div className="flex items-center gap-2">
           {Icon && <Icon size={14} className={active ? 'text-white/80' : 'text-gray-400'} />}
-          <span className="text-[13px] font-medium">{label}</span>
+          <span className="text-[0.8125rem] font-medium">{label}</span>
        </div>
-       <span className={`text-[11px] ${active ? 'text-white/80' : 'text-gray-400'}`}>{count}</span>
+       <span className={`text-[0.6875rem] ${active ? 'text-white/80' : 'text-gray-400'}`}>{count}</span>
     </button>
   );
 }

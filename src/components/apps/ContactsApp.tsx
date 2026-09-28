@@ -44,7 +44,7 @@ export default function ContactsApp() {
       {/* --- SIDEBAR --- */}
       <div className="w-50 bg-[#f2f2f7]/80 dark:bg-[#252525]/80 border-r border-black/5 dark:border-white/5 pt-8 pb-4 flex flex-col gap-0.5 backdrop-blur-xl transition-colors duration-300">
         
-        <div className="px-4 text-[11px] font-bold text-gray-400/80 mb-2 tracking-wider">ASSESSMENT</div>
+        <div className="px-4 text-[0.6875rem] font-bold text-gray-400/80 mb-2 tracking-wider">ASSESSMENT</div>
         <SidebarItem 
           label="All Criteria" 
           icon={Layers}
@@ -53,7 +53,7 @@ export default function ContactsApp() {
           onClick={() => setActiveCategory('all')} 
         />
         
-        <div className="px-4 text-[11px] font-bold text-gray-400/80 mt-6 mb-2 tracking-wider">CATEGORIES</div>
+        <div className="px-4 text-[0.6875rem] font-bold text-gray-400/80 mt-6 mb-2 tracking-wider">CATEGORIES</div>
         <SidebarItem 
           label="Action Items" 
           icon={User}
@@ -94,7 +94,7 @@ export default function ContactsApp() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search"
-                className="bg-transparent border-none outline-none text-[13px] ml-2 w-full text-black dark:text-white placeholder-gray-400"
+                className="bg-transparent border-none outline-none text-[0.8125rem] ml-2 w-full text-black dark:text-white placeholder-gray-400"
               />
            </div>
         </div>
@@ -119,10 +119,10 @@ export default function ContactsApp() {
                   </div>
                   
                   <div className="overflow-hidden flex-1">
-                     <div className={`text-[13px] font-semibold truncate ${selectedContactId === contact.id ? 'text-white' : 'text-black dark:text-white'}`}>
+                     <div className={`text-[0.8125rem] font-semibold truncate ${selectedContactId === contact.id ? 'text-white' : 'text-black dark:text-white'}`}>
                         {contact.firstName} {contact.lastName}
                      </div>
-                     <div className={`text-[11px] truncate mt-0.5 ${selectedContactId === contact.id ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                     <div className={`text-[0.6875rem] truncate mt-0.5 ${selectedContactId === contact.id ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
                         {contact.company}
                      </div>
                   </div>
@@ -171,7 +171,7 @@ export default function ContactsApp() {
                <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Evaluation Note</span>
                </div>
-               <p className="text-[15px] text-gray-700 dark:text-gray-200 leading-relaxed font-light">
+               <p className="text-[0.9375rem] text-gray-700 dark:text-gray-200 leading-relaxed font-light">
                   &ldquo;{selectedContact.note}&rdquo;
                </p>
                {selectedContact.type !== 'action' && (

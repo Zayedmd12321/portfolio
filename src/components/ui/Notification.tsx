@@ -47,14 +47,14 @@ export default function Notification() {
             <div className="flex flex-col justify-center z-10 flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-0.5 opacity-60">
                 <Command size={10} className="text-white" />
-                <span className="text-[10px] uppercase tracking-wider font-bold text-white">{typeStyles.label}</span>
+                <span className="text-[0.625rem] uppercase tracking-wider font-bold text-white">{typeStyles.label}</span>
               </div>
-              <h4 className="text-white text-[15px] font-semibold leading-tight mb-1 truncate">{notification.title}</h4>
-              <p className="text-white/70 text-[13px] leading-snug font-light">{notification.message}</p>
+              <h4 className="text-white text-[0.9375rem] font-semibold leading-tight mb-1 truncate">{notification.title}</h4>
+              <p className="text-white/70 text-[0.8125rem] leading-snug font-light">{notification.message}</p>
               
               {notification.onClick && (
                 <div className="flex items-center gap-1 mt-1.5 text-blue-300 opacity-100 transition-opacity duration-300">
-                    <span className="text-[10px] font-medium uppercase tracking-wide">Click to view</span>
+                    <span className="text-[0.625rem] font-medium uppercase tracking-wide">Click to view</span>
                     <ExternalLink size={10} />
                 </div>
               )}

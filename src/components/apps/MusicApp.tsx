@@ -231,8 +231,8 @@ export default function MusicApp() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={currentSong.cover} className="w-8 h-8 rounded shadow-sm" alt="art" />
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-xs font-semibold truncate max-w-[150px]">{currentSong.title}</span>
-                    <span className="text-[10px] text-white/50 truncate max-w-[150px]">{currentSong.artist}</span>
+                    <span className="text-xs font-semibold truncate max-w-[9.375rem]">{currentSong.title}</span>
+                    <span className="text-[0.625rem] text-white/50 truncate max-w-[9.375rem]">{currentSong.artist}</span>
                   </div>
                </div>
              )}

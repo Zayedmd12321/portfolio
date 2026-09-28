@@ -43,12 +43,12 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
              className="w-full flex items-center justify-center gap-2 bg-[#007AFF] hover:bg-[#0062cc] transition-colors py-1.5 rounded-md shadow-sm active:scale-[0.98] cursor-pointer"
            >
              <PenSquare size={14} className="text-white" />
-             <span className="text-[13px] font-medium text-white">New Message</span>
+             <span className="text-[0.8125rem] font-medium text-white">New Message</span>
            </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 space-y-0.5">
-           <div className="px-3 py-1 text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-1">Menu</div>
+           <div className="px-3 py-1 text-[0.6875rem] font-semibold text-white/30 uppercase tracking-wider mb-1">Menu</div>
            
            <SidebarItem 
              icon={PenSquare} 
@@ -89,31 +89,31 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
              {/* Form */}
              <div className="flex flex-col h-full">
                 <div className="flex items-center px-6 py-3 border-b border-white/5">
-                   <span className="w-16 text-[13px] text-white/40 text-right mr-4">To:</span>
-                   <div className="bg-[#007AFF]/20 text-[#007AFF] px-2 py-0.5 rounded text-[13px] font-medium border border-[#007AFF]/30">
+                   <span className="w-16 text-[0.8125rem] text-white/40 text-right mr-4">To:</span>
+                   <div className="bg-[#007AFF]/20 text-[#007AFF] px-2 py-0.5 rounded text-[0.8125rem] font-medium border border-[#007AFF]/30">
                       Md Zayed Ghanchi
                    </div>
                 </div>
                 <div className="flex items-center px-6 py-3 border-b border-white/5">
-                   <span className="w-16 text-[13px] text-white/40 text-right mr-4">From:</span>
+                   <span className="w-16 text-[0.8125rem] text-white/40 text-right mr-4">From:</span>
                    <input 
-                      className="flex-1 bg-transparent border-none outline-none text-[14px] text-white placeholder-white/20"
+                      className="flex-1 bg-transparent border-none outline-none text-[0.875rem] text-white placeholder-white/20"
                       placeholder="your@email.com"
                       value={formData.from}
                       onChange={(e) => setFormData({...formData, from: e.target.value})}
                    />
                 </div>
                 <div className="flex items-center px-6 py-3 border-b border-white/5">
-                   <span className="w-16 text-[13px] text-white/40 text-right mr-4">Subject:</span>
+                   <span className="w-16 text-[0.8125rem] text-white/40 text-right mr-4">Subject:</span>
                    <input 
-                      className="flex-1 bg-transparent border-none outline-none text-[14px] font-medium text-white placeholder-white/20"
+                      className="flex-1 bg-transparent border-none outline-none text-[0.875rem] font-medium text-white placeholder-white/20"
                       placeholder="Project Inquiry"
                       value={formData.subject}
                       onChange={(e) => setFormData({...formData, subject: e.target.value})}
                    />
                 </div>
                 <textarea 
-                   className="flex-1 p-6 bg-transparent border-none outline-none text-[15px] leading-relaxed text-white/90 placeholder-white/20 resize-none font-light"
+                   className="flex-1 p-6 bg-transparent border-none outline-none text-[0.9375rem] leading-relaxed text-white/90 placeholder-white/20 resize-none font-light"
                    placeholder="Hi Zayed, I saw your portfolio and..."
                    value={formData.message}
                    onChange={(e) => setFormData({...formData, message: e.target.value})}
@@ -204,9 +204,9 @@ const SidebarItem = React.memo(function SidebarItem({ icon: Icon, label, count, 
       }`}
     >
        <Icon size={16} className={isActive ? 'text-white' : 'text-white/50 group-hover:text-white'} />
-       <span className="text-[13px] font-medium flex-1 text-left">{label}</span>
+       <span className="text-[0.8125rem] font-medium flex-1 text-left">{label}</span>
        {count && (
-          <span className={`text-[11px] px-1.5 rounded-full ${isActive ? 'text-white/80 bg-black/10' : 'text-white/40'}`}>
+          <span className={`text-[0.6875rem] px-1.5 rounded-full ${isActive ? 'text-white/80 bg-black/10' : 'text-white/40'}`}>
              {count}
           </span>
        )}
@@ -228,7 +228,7 @@ const ContactCard = React.memo(function ContactCard({ icon: Icon, label, value, 
             <Icon size={18} className="text-white/70 group-hover:text-white" />
          </div>
          <div className="text-left">
-            <div className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">{label}</div>
+            <div className="text-[0.625rem] text-white/40 uppercase tracking-wider font-semibold">{label}</div>
             <div className="text-sm text-white font-medium">{value}</div>
          </div>
       </a>
