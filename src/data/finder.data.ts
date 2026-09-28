@@ -23,8 +23,8 @@ export const finderSidebarCloud: SidebarItemConfig[] = [
 ];
 
 export const finderFiles: FileItemConfig[] = [
-  { label: 'Portfolio v1', type: 'folder' },
-  { label: 'Inter IIT', type: 'folder' },
-  { label: 'profile.jpg', type: 'image' },
+  { label: 'Vylos', type: 'folder' },
+  { label: 'Inter IIT 14.0', type: 'folder' },
+  { label: 'zayed.png', type: 'image' },
   { label: 'main.py', type: 'code' },
 ];

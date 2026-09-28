@@ -89,7 +89,7 @@ function DesktopContent() {
       Math.round(Math.min(max, Math.max(min, ah * pct)));
 
     return {
-      notes:        { width: wPct(0.55, 560, 1000), height: hPct(0.70, 440, 700) },
+      notes:        { width: wPct(0.75, 700, 1400), height: hPct(0.70, 440, 700) },
       siri:         { width: wPct(0.28, 360, 500),  height: hPct(0.60, 440, 600) },
       mail:         { width: wPct(0.50, 560, 900),  height: hPct(0.58, 440, 600) },
       resume:       { width: wPct(0.44, 560, 800),  height: hPct(0.58, 440, 600) },

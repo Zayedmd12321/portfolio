@@ -268,7 +268,7 @@ function PortfolioSplitView() {
   else if (mode === 'medium') {
     return (
       <div ref={containerRef} className="flex w-full h-full divide-x divide-white/5 bg-[#1c1c1c]">
-        <div className="w-[42%] min-w-95 shrink-0 h-full pb-8 pr-8 pl-8 flex flex-col justify-center text-center bg-[#1e1e1e]/30 overflow-y-auto macos-scrollbar">
+        <div className="w-[42%] min-w-95 shrink-0 h-full pb-8 pr-8 pl-8 bg-[#1e1e1e]/30 overflow-y-auto macos-scrollbar">
            <ProfileSection centered={true} />
         </div>
         
@@ -301,9 +301,6 @@ function ProfileSection({ centered }: { centered?: boolean }) {
     <div className={`space-y-6 ${centered ? 'flex flex-col items-center text-center' : ''} animate-in fade-in slide-in-from-bottom-4 duration-700 pt-8`}>
       <div className="relative group w-40 h-40">
           <div className="absolute inset-0 rounded-full bg-linear-to-tr from-[#dcae48] to-purple-500 blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-          {/* Local static profile image. Kept as a plain <img> to preserve the
-              existing full-bleed rounded/blur styling without introducing
-              next/image layout wrappers. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/me.jpg" alt="Profile" className="relative w-full h-full rounded-full object-cover border-2 border-white/10 shadow-2xl z-10" />
       </div>
@@ -317,10 +314,20 @@ function ProfileSection({ centered }: { centered?: boolean }) {
           </div>
       </div>
 
-      <div className="flex items-center gap-2 text-[12px] font-medium text-gray-300 bg-white/5 py-1.5 px-4 rounded-full border border-white/5 w-fit shadow-sm">
-        {/* Static, classy emerald glow instead of frantic ping */}
-        <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-        {profileData.status}
+      <div className={`flex flex-wrap gap-2 ${centered ? 'justify-center' : ''} w-full`}>
+        {profileData.status.split('|').map((chunk, idx) => {
+          const label = chunk.trim();
+          if (!label) return null;
+          return (
+            <div
+              key={idx}
+              className="flex items-center gap-2 text-[11px] font-medium text-gray-200 bg-white/5 py-1.5 px-3 rounded-full border border-white/5 shadow-sm max-w-full"
+            >
+              <Briefcase size={11} className="text-[#dcae48] shrink-0" strokeWidth={2.25} />
+              <span className="whitespace-nowrap truncate">{label}</span>
+            </div>
+          );
+        })}
       </div>
 
       <div className="flex items-center gap-4 pt-2">
@@ -367,13 +374,35 @@ function ExperienceSection() {
             <div className="relative rounded-xl border border-white/5 bg-[#252525]/50 p-5 transition-all duration-300 hover:bg-[#252525] hover:border-[#dcae48]/30 hover:shadow-lg hover:-translate-y-0.5">
               
               {/* Card Header: Handles resizing via flex-wrap */}
-              <div className="flex flex-wrap justify-between items-start gap-2 mb-3">
-                <div className="flex flex-col">
-                  <h3 className="text-[16px] font-bold text-white leading-tight group-hover:text-[#dcae48] transition-colors">
-                    {exp.title}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[13px] text-gray-400 font-medium">{exp.company}</span>
+              <div className="flex flex-wrap justify-between items-start gap-3 mb-3">
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  {(exp.logo || exp.logoText) && (
+                    <div className={`w-10 h-10 rounded-lg shrink-0 flex items-center justify-center overflow-hidden border border-white/10 shadow-sm ${exp.logoBg ?? 'bg-white'}`}>
+                      {exp.logoText ? (
+                        <span
+                          className={exp.logoText.className}
+                          style={{ fontFamily: "'Sansation', 'Inter', sans-serif" }}
+                        >
+                          {exp.logoText.text}
+                        </span>
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={exp.logo}
+                          alt={`${exp.company} logo`}
+                          className="w-7 h-7 object-contain"
+                          style={exp.logoScale ? { transform: `scale(${exp.logoScale})` } : undefined}
+                        />
+                      )}
+                    </div>
+                  )}
+                  <div className="flex flex-col min-w-0">
+                    <h3 className="text-[16px] font-bold text-white leading-tight group-hover:text-[#dcae48] transition-colors">
+                      {exp.title}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[13px] text-gray-400 font-medium truncate">{exp.company}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -410,7 +439,12 @@ function ExperienceSection() {
                     'Docker': '/skills/docker.svg',
                     'PostgreSQL': '/skills/postgresql.svg',
                     'Express': '/skills/expressjs_dark.svg',
-                    
+                    'Python': '/skills/python.svg',
+                    'Redis': '/skills/redis.svg',
+                    'Kafka': '/skills/kafka.svg',
+                    'C++': '/skills/cpp.svg',
+                    'Nginx': '/skills/nginx.svg',
+                    'NumPy': '/skills/python.svg',
                   };
                   const techIcon = techIconMap[tech];
                   
@@ -519,7 +553,6 @@ function ProjectCard({ project, onOpenApp }: { project: Projects; onOpenApp?: (i
       'AWS': 'aws_dark.svg',
       'Nginx': 'nginx.svg',
       'FastAPI': 'fastapi.svg',
-      'Ubuntu': 'ubuntu.svg',
       'Next.js': 'nextjs_icon_dark.svg',
       'React': 'react_dark.svg',
       'Frontend': 'react_dark.svg',
@@ -527,12 +560,19 @@ function ProjectCard({ project, onOpenApp }: { project: Projects; onOpenApp?: (i
       'Docker': 'docker.svg',
       'TypeScript': 'typescript.svg',
       'Node.js': 'nodejs.svg',
+      'Express': 'expressjs_dark.svg',
       'MongoDB': 'mongodb-icon-dark.svg',
       'PostgreSQL': 'postgresql.svg',
       'Tailwind': 'tailwindcss.svg',
       'Git': 'git.svg',
       'Firebase': 'firebase.svg',
-      'Supabase': 'supabase.svg'
+      'Supabase': 'supabase.svg',
+      'Python': 'python.svg',
+      'Redis': 'redis.svg',
+      'Kafka': 'kafka.svg',
+      'C++': 'cpp.svg',
+      'NumPy': 'python.svg',
+      'Figma': 'figma.svg',
     };
     return techMap[tech] || null;
   };

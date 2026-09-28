@@ -5,9 +5,11 @@ export interface CommandResponse {
 }
 
 export const terminalCommands: Record<string, string> = {
-  help: 'Available commands: help, clear, about, contact',
-  about: 'I am a 2nd year Aerospace student at IIT KGP.',
-  contact: 'Email: zayed@example.com',
+  help: 'Available commands: help, clear, about, contact, whoami, skills',
+  about: 'Md Zayed Ghanchi — B.Tech Aerospace @ IIT Kharagpur. Incoming SDE @ Corridor Platforms.',
+  whoami: 'zayed',
+  skills: 'React, Next.js, TypeScript, FastAPI, Python, Node.js, PostgreSQL, Docker, AWS, Kafka.',
+  contact: 'Email: eagle.zayed@gmail.com | GitHub: Zayedmd12321 | LinkedIn: md-zayed-ghanchi',
 };
 
 export const terminalUsername = 'zayed';

@@ -1,6 +1,6 @@
-import { 
-  Briefcase, Zap, ShieldCheck, ThumbsUp, 
-  Brain, Calendar, Rocket 
+import {
+  Briefcase, Zap, ShieldCheck, ThumbsUp,
+  Brain, Calendar, Rocket
 } from 'lucide-react';
 import { Contact } from '@/types/contacts.types';
 
@@ -12,8 +12,8 @@ export const CONTACTS: Contact[] = [
     lastName: 'Manager',
     company: 'Your Company',
     role: 'Decision Maker',
-    avatar: Briefcase, 
-    email: 'zayed@example.com',
+    avatar: Briefcase,
+    email: 'eagle.zayed@gmail.com',
     location: 'Pending Decision',
     note: 'The candidate has passed all technical and cultural assessments. Ready to proceed with an offer.',
     type: 'action',
@@ -28,8 +28,8 @@ export const CONTACTS: Contact[] = [
     company: 'Engineering Dept',
     role: 'Senior Level',
     avatar: Zap,
-    location: 'React / Next.js / Node',
-    note: 'Demonstrates exceptional ability to build scalable, performant web applications. Code quality is high-grade.',
+    location: 'React / Next.js / FastAPI',
+    note: 'Ships resilient, large-scale web systems end-to-end. Comfortable across frontend, backend, and container/infra layers.',
     type: 'skill',
     color: 'bg-orange-500'
   },

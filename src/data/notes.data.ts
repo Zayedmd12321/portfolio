@@ -12,16 +12,16 @@ export const initialNotes: Note[] = [
   {
     id: 'about',
     title: 'About Me',
-    date: '12/13/2025',
-    preview: 'Md Zayed Ghanchi - Portfolio',
+    date: '09/28/2026',
+    preview: 'Md Zayed Ghanchi — Portfolio',
     isPortfolio: true,
     body: ''
   },
   {
     id: 'projects',
     title: 'Projects',
-    date: '12/13/2025',
-    preview: 'My Notable Projects & Work',
+    date: '09/28/2026',
+    preview: 'Vylos, Wind Router, Pathway & more',
     isPortfolio: true,
     body: ''
   }

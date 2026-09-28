@@ -134,10 +134,10 @@ export default function MailApp({ initialSection = 'compose' }: MailAppProps) {
               </p>
 
               <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                 <ContactCard icon={Mail} label="Email" value="zayed@example.com" />
-                 <ContactCard icon={Linkedin} label="LinkedIn" value="/in/zayedghanchi" href="#" />
-                 <ContactCard icon={Github} label="GitHub" value="@zayedghanchi" href="#" />
-                 <ContactCard icon={User} label="Resume" value="View PDF" href="#" />
+                 <ContactCard icon={Mail} label="Email" value="eagle.zayed@gmail.com" href="mailto:eagle.zayed@gmail.com" />
+                 <ContactCard icon={Linkedin} label="LinkedIn" value="/in/md-zayed-ghanchi" href="https://www.linkedin.com/in/md-zayed-ghanchi-bb999a325" />
+                 <ContactCard icon={Github} label="GitHub" value="@Zayedmd12321" href="https://github.com/Zayedmd12321" />
+                 <ContactCard icon={User} label="Resume" value="View PDF" href="/resume.pdf" />
               </div>
 
               <button 

@@ -49,7 +49,7 @@ export default function VSCodeApp() {
             </div>
             <div className="w-full">
               <h1 className="text-3xl font-bold mb-8 text-white">{profileData.name} <span className="animate-pulse">🚀</span></h1>
-              
+
               <div className="space-y-1 font-mono">
                 <div className="flex gap-2">
                   <span className="text-[#569cd6]">const</span>
@@ -57,7 +57,7 @@ export default function VSCodeApp() {
                   <span className="text-[#d4d4d4]">=</span>
                   <span className="text-[#d4d4d4]">{`{`}</span>
                 </div>
-                
+
                 <div className="pl-6">
                    <span className="text-[#9cdcfe]">name:</span> <span className="text-[#ce9178]">{`'${profileData.name}'`}</span>,
                 </div>
@@ -66,6 +66,9 @@ export default function VSCodeApp() {
                 </div>
                 <div className="pl-6">
                    <span className="text-[#9cdcfe]">focus:</span> <span className="text-[#ce9178]">{`'${profileData.focus}'`}</span>,
+                </div>
+                <div className="pl-6">
+                   <span className="text-[#9cdcfe]">status:</span> <span className="text-[#ce9178]">{`'${profileData.status}'`}</span>,
                 </div>
                 <div className="pl-6">
                    <span className="text-[#9cdcfe]">techStack:</span> <span className="text-[#d4d4d4]">[</span>
